@@ -1,65 +1,91 @@
-import Image from "next/image";
+'use client';
+
+import React from 'react';
+import { Header } from '@/components/Header';
+import { Hero } from '@/components/Hero';
+import { DemoSimulator } from '@/components/DemoSimulator';
+import { BentoGrid } from '@/components/BentoGrid';
+import { SandboxPlayground } from '@/components/SandboxPlayground';
+import { FaqAccordion } from '@/components/FaqAccordion';
+import { Footer } from '@/components/Footer';
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <div className="relative min-h-screen w-full overflow-hidden bg-[#030303] text-zinc-100 font-sans selection:bg-purple-500/30 selection:text-purple-200 flex flex-col justify-between">
+      {/* Background Glow effects */}
+      <div className="absolute top-[-10%] left-[-10%] h-[600px] w-[600px] rounded-full bg-purple-900/10 blur-[120px] pointer-events-none" />
+      <div className="absolute top-[40%] right-[-10%] h-[500px] w-[500px] rounded-full bg-cyan-900/10 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] left-[20%] h-[600px] w-[600px] rounded-full bg-emerald-950/10 blur-[150px] pointer-events-none" />
+
+      {/* Futuristic Grid Overlay */}
+      <div
+        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        style={{
+          backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
+          backgroundSize: '24px 24px',
+        }}
+      />
+
+      {/* Main Page Content Wrapper */}
+      <div className="flex flex-col flex-1">
+        {/* Header */}
+        <Header />
+
+        {/* Main Content */}
+        <main className="flex-1">
+          {/* Hero section */}
+          <Hero />
+
+          {/* Live Demo simulator */}
+          <DemoSimulator />
+
+          {/* Bento Grid Features */}
+          <BentoGrid />
+
+          {/* Sandbox Playground */}
+          <SandboxPlayground />
+
+          {/* FAQ Accordion */}
+          <FaqAccordion />
+
+          {/* CALL TO ACTION BANNER */}
+          <section className="relative mx-auto max-w-7xl px-6 pb-24 sm:px-8">
+            <div className="relative rounded-3xl overflow-hidden border border-purple-500/20 bg-gradient-to-br from-purple-950/20 via-zinc-950 to-black p-8 md:p-12 flex flex-col items-center text-center shadow-[0_0_50px_rgba(139,92,246,0.1)]">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-72 h-72 rounded-full bg-purple-500/5 blur-[80px] pointer-events-none" />
+
+              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl text-gradient">
+                Reclaim Your Time &amp; Attention Today.
+              </h2>
+              <p className="mt-4 max-w-md text-sm text-zinc-400 leading-relaxed">
+                Join 12,000+ knowledge workers using OmniMind.ai to filter out
+                notifications and focus on high-impact work.
+              </p>
+
+              <div className="mt-8 flex flex-col sm:flex-row gap-3 w-full max-w-md justify-center">
+                <input
+                  type="email"
+                  placeholder="Enter your corporate email..."
+                  className="rounded-xl border border-white/10 bg-[#050505] px-4 py-3 text-xs text-zinc-200 placeholder-zinc-500 focus:border-purple-500/50 focus:outline-none w-full sm:w-auto sm:flex-1"
+                />
+                <button
+                  onClick={() =>
+                    alert('Thank you for signing up! We will contact you soon.')
+                  }
+                  className="rounded-xl bg-white text-black px-6 py-3 text-xs font-bold hover:bg-zinc-200 transition-colors shrink-0"
+                >
+                  Get Beta Access
+                </button>
+              </div>
+              <p className="mt-3 text-[10px] text-zinc-500">
+                Free 14-day trial • No credit card required
+              </p>
+            </div>
+          </section>
+        </main>
+      </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

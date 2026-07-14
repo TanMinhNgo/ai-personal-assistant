@@ -1,26 +1,306 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #030303;
+  --foreground: #f4f4f5;
+  --color-primary: #8b5cf6;
+  --color-secondary: #06b6d4;
+  --color-accent: #10b981;
 }
 
-@theme inline {
+@theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --font-sans: var(--font-geist-sans), sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-float-slow: float 8s ease-in-out infinite;
+  --animate-float-fast: float 4s ease-in-out infinite;
+  --animate-pulse-glow: pulse-glow 3s ease-in-out infinite;
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-shimmer: shimmer 2.5s linear infinite;
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-10px) rotate(0.5deg);
+    }
+  }
+  @keyframes float-slow {
+    0%,
+    100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-15px) rotate(-1deg);
+    }
+  }
+  @keyframes float-fast {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-6px);
+    }
+  }
+  @keyframes pulse-glow {
+    0%,
+    100% {
+      opacity: 0.5;
+      filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.3));
+    }
+    50% {
+      opacity: 1;
+      filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.7));
+    }
+  }
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
+    }
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #050505;
+}
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #ffffff 30%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-purple-cyan {
+  background: linear-gradient(135deg, #c084fc 10%, #818cf8 50%, #2dd4bf 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.bg-glass {
+  background: rgba(10, 10, 10, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.bg-glass-hover:hover {
+  background: rgba(20, 20, 20, 0.85);
+  border-color: rgba(139, 92, 246, 0.35);
+  box-shadow: 0 10px 30px -10px rgba(139, 92, 246, 0.15);
+}
+.auth-page {
+  position: relative;
+  display: grid;
+  min-height: 100dvh;
+  place-items: center;
+  overflow: hidden;
+  padding: 1.5rem;
+  background: #10100f;
+}
+
+.auth-page__orb {
+  position: absolute;
+  width: 26rem;
+  height: 26rem;
+  border-radius: 9999px;
+  pointer-events: none;
+  filter: blur(96px);
+  opacity: 0.26;
+}
+
+.auth-page__orb--top {
+  top: -13rem;
+  left: -10rem;
+  background: #7c3aed;
+}
+
+.auth-page__orb--bottom {
+  right: -12rem;
+  bottom: -14rem;
+  background: #4338ca;
+}
+
+.auth-card {
+  position: relative;
+  width: 100%;
+  max-width: 28rem;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  border-radius: 1rem;
+  padding: 2rem;
+  background: rgb(24 24 23 / 0.94);
+  box-shadow:
+    0 24px 70px rgb(0 0 0 / 0.38),
+    inset 0 1px 0 rgb(255 255 255 / 0.05);
+}
+
+.auth-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  color: #fafafa;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.auth-brand__mark {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: 0.625rem;
+  background: #8b5cf6;
+  color: #fff;
+  font-size: 0.875rem;
+}
+
+.auth-field {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.auth-label {
+  color: #d4d4d8;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.auth-input {
+  width: 100%;
+  border: 1px solid #3f3f46;
+  border-radius: 0.625rem;
+  padding: 0.75rem 0.875rem;
+  background: #27272a;
+  color: #fafafa;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  outline: none;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    background-color 150ms ease;
+}
+
+.auth-input::placeholder {
+  color: #a1a1aa;
+}
+
+.auth-input:hover {
+  border-color: #52525b;
+}
+
+.auth-input:focus {
+  border-color: #a78bfa;
+  background: #2b2b2e;
+  box-shadow: 0 0 0 3px rgb(167 139 250 / 0.2);
+}
+
+.auth-primary,
+.auth-secondary {
+  display: inline-flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.625rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.25rem;
+  transition:
+    transform 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease;
+}
+
+.auth-primary {
+  background: #a78bfa;
+  color: #17131d;
+}
+
+.auth-primary:hover:not(:disabled) {
+  background: #c4b5fd;
+}
+
+.auth-secondary {
+  border: 1px solid #52525b;
+  background: transparent;
+  color: #f4f4f5;
+}
+
+.auth-secondary:hover:not(:disabled) {
+  border-color: #71717a;
+  background: #27272a;
+}
+
+.auth-primary:active:not(:disabled),
+.auth-secondary:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.auth-primary:focus-visible,
+.auth-secondary:focus-visible,
+.auth-brand:focus-visible {
+  outline: 2px solid #c4b5fd;
+  outline-offset: 3px;
+}
+
+.auth-primary:disabled,
+.auth-secondary:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+@media (max-width: 639px) {
+  .auth-page {
+    padding: 1rem;
+  }
+
+  .auth-card {
+    padding: 1.5rem;
+  }
+}
+.auth-spinner {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+  border: 2px solid rgb(196 181 253 / 0.3);
+  border-top-color: #c4b5fd;
+  border-radius: 9999px;
+  animation: auth-spin 750ms linear infinite;
+}
+
+@keyframes auth-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-spinner {
+    animation: none;
+  }
 }
