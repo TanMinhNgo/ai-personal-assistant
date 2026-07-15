@@ -520,5 +520,3 @@ function Metric({
     </div>
   );
 }
-
-
