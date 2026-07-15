@@ -16,7 +16,7 @@ export function LegalPage({
   sections: LegalSection[];
 }) {
   return (
-    <main className="min-h-[100dvh] bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-100">
+    <main className="min-h-dvh bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-100">
       <header className="border-b border-slate-200 bg-white/90 px-5 py-5 backdrop-blur dark:border-slate-800 dark:bg-slate-950/90 sm:px-8">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-4">
           <Link

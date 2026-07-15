@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { ChevronsRight, LoaderCircle, Zap } from 'lucide-react';
 import { PlatformIcon } from './Icons';
 
 // Predefined tabs for the Interactive Demo
@@ -285,27 +286,19 @@ export const DemoSimulator: React.FC = () => {
             {/* Processing Connector arrow */}
             <div className="md:col-span-1 flex flex-col items-center justify-center gap-2 py-4 md:py-0">
               <div className="relative flex items-center justify-center w-10 h-10 rounded-full border border-purple-500/20 bg-purple-500/5">
-                <svg
-                  className={`w-5 h-5 text-purple-400 ${isProcessing ? 'animate-spin' : ''}`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2.5}
-                >
+                <>
                   {isProcessing ? (
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89M9 11l3-3 3 3m-3-3v12"
+                    <LoaderCircle
+                      className="size-5 animate-spin text-purple-400"
+                      aria-hidden="true"
                     />
                   ) : (
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M13 5l7 7-7 7M5 5l7 7-7 7"
+                    <ChevronsRight
+                      className="size-5 text-purple-400"
+                      aria-hidden="true"
                     />
                   )}
-                </svg>
+                </>
                 <div className="absolute inset-0 rounded-full bg-purple-500/10 blur" />
               </div>
               <span className="text-[9px] font-bold text-purple-400 uppercase tracking-widest">
@@ -343,17 +336,11 @@ export const DemoSimulator: React.FC = () => {
               <div>
                 <div className="flex items-center justify-between border-b border-white/5 pb-3 mb-4">
                   <span className="text-xs font-bold text-purple-400 uppercase tracking-widest flex items-center gap-1.5">
-                    <svg
-                      className="w-3.5 h-3.5"
+                    <Zap
+                      className="size-3.5"
                       fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
+                      aria-hidden="true"
+                    />
                     AI Synthesis Output
                   </span>
                   <span className="text-[10px] text-zinc-500 font-medium">

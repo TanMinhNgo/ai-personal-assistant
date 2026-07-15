@@ -4,33 +4,30 @@ import {
   ArrowLeft,
   Bell,
   Brain,
-  CaretDoubleLeft,
-  CaretDoubleRight,
-  CheckCircle,
-  Clock,
-  CurrencyDollar,
-  GearSix,
-  GridFour,
-  Lightning,
-  LinkSimple,
-  Moon,
+  ChevronsLeft,
+  ChevronsRight,
+  DollarSign,
+  LayoutGrid,
+  Link2,
   ListChecks,
-  MagnifyingGlass,
-  SignOut,
-  Sparkle,
+  LogOut,
+  Moon,
+  Search,
+  Settings,
+  Sparkles,
   Sun,
-  TrendUp,
-} from '@phosphor-icons/react';
-import type { Icon } from '@phosphor-icons/react';
+  type LucideIcon,
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { DashboardHome } from '@/components/DashboardHome';
 import { insforge } from '@/lib/insforge';
 
 type NavigationItem = {
   label: string;
   href: string;
-  icon: Icon;
+  icon: LucideIcon;
   color: string;
 };
 type TabKey =
@@ -41,7 +38,7 @@ type SignedInUser = {
 };
 
 const navigation: NavigationItem[] = [
-  { label: 'Dashboard', href: '/', icon: GridFour, color: 'bg-violet-500' },
+  { label: 'Dashboard', href: '/', icon: LayoutGrid, color: 'bg-violet-500' },
   { label: 'AI Agent', href: '/ai-agent', icon: Brain, color: 'bg-sky-500' },
   {
     label: 'Briefing',
@@ -52,14 +49,14 @@ const navigation: NavigationItem[] = [
   {
     label: 'Integrations',
     href: '/integrations',
-    icon: LinkSimple,
+    icon: Link2,
     color: 'bg-emerald-500',
   },
   { label: 'Alerts', href: '/alerts', icon: Bell, color: 'bg-rose-500' },
   {
     label: 'Settings',
     href: '/settings',
-    icon: GearSix,
+    icon: Settings,
     color: 'bg-slate-600',
   },
 ];
@@ -114,7 +111,7 @@ export function AppShell({
             className="flex min-w-0 items-center gap-3 overflow-hidden"
           >
             <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-violet-500 text-white shadow-lg shadow-violet-500/25">
-              <Sparkle size={24} weight="fill" aria-hidden="true" />
+              <Sparkles size={24} aria-hidden="true" />
             </span>
             {!collapsed && (
               <span className="truncate text-lg font-bold tracking-tight">
@@ -129,7 +126,7 @@ export function AppShell({
               onClick={() => setCollapsed(true)}
               className="grid size-9 place-items-center rounded-xl text-slate-400 transition hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-400"
             >
-              <CaretDoubleLeft size={20} weight="bold" aria-hidden="true" />
+              <ChevronsLeft size={20} aria-hidden="true" />
             </button>
           )}
         </div>
@@ -140,7 +137,7 @@ export function AppShell({
             onClick={() => setCollapsed(false)}
             className="mt-7 grid size-11 place-items-center self-center rounded-2xl bg-white/10 text-slate-200 transition hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-400"
           >
-            <CaretDoubleRight size={22} weight="bold" aria-hidden="true" />
+            <ChevronsRight size={22} aria-hidden="true" />
           </button>
         )}
 
@@ -158,7 +155,7 @@ export function AppShell({
                 <span
                   className={`grid size-11 shrink-0 place-items-center rounded-xl text-white ${color}`}
                 >
-                  <MenuIcon size={24} weight="bold" aria-hidden="true" />
+                  <MenuIcon size={24} aria-hidden="true" />
                 </span>
                 {!collapsed && <span className="font-medium">{label}</span>}
               </Link>
@@ -173,7 +170,7 @@ export function AppShell({
             className={`flex w-full items-center gap-3 rounded-2xl bg-violet-500 p-2 text-white shadow-lg shadow-violet-950/30 transition hover:bg-violet-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-300 ${collapsed ? 'justify-center' : ''}`}
           >
             <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-white/20">
-              <CurrencyDollar size={24} weight="bold" aria-hidden="true" />
+              <DollarSign size={24} aria-hidden="true" />
             </span>
             {!collapsed && (
               <span className="font-semibold">Pricing Settings</span>
@@ -208,7 +205,7 @@ export function AppShell({
               title="Sign out"
               className="grid size-9 shrink-0 place-items-center rounded-xl bg-white/10 text-slate-300 transition hover:bg-rose-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-300"
             >
-              <SignOut size={19} weight="bold" aria-hidden="true" />
+              <LogOut size={19} aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -222,7 +219,7 @@ export function AppShell({
               aria-label="OmniMind dashboard"
               className="grid size-10 place-items-center rounded-xl bg-violet-500 text-white md:hidden"
             >
-              <Sparkle size={21} weight="fill" aria-hidden="true" />
+              <Sparkles size={21} aria-hidden="true" />
             </Link>
             <div>
               <p className="text-sm font-medium text-slate-500">
@@ -238,7 +235,7 @@ export function AppShell({
               href="/landing"
               className="inline-flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500"
             >
-              <ArrowLeft size={20} weight="bold" aria-hidden="true" />
+              <ArrowLeft size={20} aria-hidden="true" />
               <span className="hidden sm:inline">Back to landing</span>
             </Link>
             <button
@@ -250,9 +247,9 @@ export function AppShell({
               className="grid size-11 place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500"
             >
               {isDark ? (
-                <Moon size={22} weight="bold" aria-hidden="true" />
+                <Moon size={22} aria-hidden="true" />
               ) : (
-                <Sun size={22} weight="bold" aria-hidden="true" />
+                <Sun size={22} aria-hidden="true" />
               )}
             </button>
             <button
@@ -260,7 +257,7 @@ export function AppShell({
               aria-label="Search"
               className="grid size-11 place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500"
             >
-              <MagnifyingGlass size={22} weight="bold" aria-hidden="true" />
+              <Search size={22} aria-hidden="true" />
             </button>
           </div>
         </header>
@@ -272,89 +269,9 @@ export function AppShell({
 
 export function DashboardShell() {
   return (
-    <AppShell title="Good morning, Alex">
-      <DashboardContent />
+    <AppShell title="Dashboard">
+      <DashboardHome />
     </AppShell>
-  );
-}
-
-function DashboardContent() {
-  return (
-    <div className="mx-auto max-w-7xl p-5 sm:p-8">
-      <section className="grid gap-4 lg:grid-cols-[1.55fr_0.95fr]">
-        <div className="rounded-3xl bg-slate-950 p-6 text-white shadow-xl shadow-slate-950/15 sm:p-8">
-          <div className="flex items-center justify-between gap-4">
-            <span className="grid size-12 place-items-center rounded-2xl bg-violet-500">
-              <Lightning size={28} weight="fill" aria-hidden="true" />
-            </span>
-            <span className="rounded-full bg-emerald-400/15 px-3 py-1 text-xs font-bold text-emerald-300">
-              All systems ready
-            </span>
-          </div>
-          <p className="mt-7 text-sm font-semibold text-violet-300">
-            YOUR PERSONAL ASSISTANT
-          </p>
-          <h2 className="mt-2 max-w-xl text-3xl font-bold tracking-tight sm:text-4xl">
-            Your day is organized and ready to move.
-          </h2>
-          <p className="mt-4 max-w-lg text-sm leading-6 text-slate-400">
-            OmniMind found the signal in your inbox, calendar, and connected
-            tools so you can focus on what matters next.
-          </p>
-          <Link
-            href="/ai-agent"
-            className="mt-7 inline-block rounded-xl bg-violet-500 px-5 py-3 text-sm font-bold text-white transition hover:bg-violet-400 active:translate-y-px"
-          >
-            Open AI Agent
-          </Link>
-        </div>
-        <div className="dashboard-card rounded-3xl border border-slate-200 bg-white p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-slate-500">Focus score</p>
-              <p className="mt-1 text-4xl font-bold tracking-tight">
-                86<span className="text-lg text-slate-400">/100</span>
-              </p>
-            </div>
-            <span className="grid size-12 place-items-center rounded-2xl bg-emerald-500 text-white">
-              <TrendUp size={28} weight="bold" aria-hidden="true" />
-            </span>
-          </div>
-          <div className="mt-8 h-3 overflow-hidden rounded-full bg-slate-100">
-            <div className="h-full w-[86%] rounded-full bg-emerald-500" />
-          </div>
-          <p className="mt-4 text-sm leading-6 text-slate-500">
-            You are 12% more focused than last week. Keep your afternoon clear.
-          </p>
-        </div>
-      </section>
-      <section className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Metric
-          value="12"
-          label="Priority messages"
-          icon={Bell}
-          color="bg-rose-500"
-        />
-        <Metric
-          value="4"
-          label="Tasks due today"
-          icon={CheckCircle}
-          color="bg-sky-500"
-        />
-        <Metric
-          value="3h 45m"
-          label="Focus time protected"
-          icon={Clock}
-          color="bg-amber-400"
-        />
-        <Metric
-          value="8"
-          label="Active integrations"
-          icon={LinkSimple}
-          color="bg-emerald-500"
-        />
-      </section>
-    </div>
   );
 }
 
@@ -364,7 +281,7 @@ const tabContent: Record<
     title: string;
     description: string;
     action: string;
-    icon: Icon;
+    icon: LucideIcon;
     color: string;
     details: string[];
   }
@@ -400,7 +317,7 @@ const tabContent: Record<
     description:
       'Connect the tools you already use so OmniMind can keep your work in one place.',
     action: 'Add integration',
-    icon: LinkSimple,
+    icon: Link2,
     color: 'bg-emerald-500',
     details: [
       'Gmail is connected',
@@ -426,7 +343,7 @@ const tabContent: Record<
     description:
       'Control your profile, preferences, notifications, and assistant behavior.',
     action: 'Save preferences',
-    icon: GearSix,
+    icon: Settings,
     color: 'bg-slate-600',
     details: [
       'Profile and account',
@@ -439,7 +356,7 @@ const tabContent: Record<
     description:
       'Manage your plan, billing details, and workspace limits from one place.',
     action: 'View plans',
-    icon: CurrencyDollar,
+    icon: DollarSign,
     color: 'bg-violet-500',
     details: [
       'Personal plan active',
@@ -459,7 +376,7 @@ export function DashboardTabPage({ tab }: { tab: TabKey }) {
           <span
             className={`grid size-12 place-items-center rounded-2xl text-white ${content.color}`}
           >
-            <TabIcon size={28} weight="bold" aria-hidden="true" />
+            <TabIcon size={28} aria-hidden="true" />
           </span>
           <h2 className="mt-7 text-3xl font-bold tracking-tight sm:text-4xl">
             {content.title}
@@ -483,7 +400,7 @@ export function DashboardTabPage({ tab }: { tab: TabKey }) {
               <span
                 className={`grid size-11 place-items-center rounded-2xl text-white ${content.color}`}
               >
-                <TabIcon size={23} weight="bold" aria-hidden="true" />
+                <TabIcon size={23} aria-hidden="true" />
               </span>
               <p className="mt-5 text-lg font-bold">{detail}</p>
               <p className="mt-2 text-sm leading-6 text-slate-500">
@@ -494,29 +411,5 @@ export function DashboardTabPage({ tab }: { tab: TabKey }) {
         </section>
       </div>
     </AppShell>
-  );
-}
-
-function Metric({
-  value,
-  label,
-  icon: MetricIcon,
-  color,
-}: {
-  value: string;
-  label: string;
-  icon: Icon;
-  color: string;
-}) {
-  return (
-    <div className="dashboard-card rounded-3xl border border-slate-200 bg-white p-5">
-      <span
-        className={`grid size-12 place-items-center rounded-2xl text-white ${color}`}
-      >
-        <MetricIcon size={25} weight="bold" aria-hidden="true" />
-      </span>
-      <p className="mt-5 text-2xl font-bold tracking-tight">{value}</p>
-      <p className="mt-1 text-sm text-slate-500">{label}</p>
-    </div>
   );
 }

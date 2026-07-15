@@ -11,9 +11,12 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
+    "@google/genai": "^2.11.0",
     "@insforge/sdk": "^1.4.4",
-    "@phosphor-icons/react": "^2.1.10",
+    "baileys": "^7.0.0-rc13",
+    "lucide-react": "^1.24.0",
     "next": "16.2.10",
+    "pino": "^10.3.1",
     "prettier": "^3.9.5",
     "react": "19.2.4",
     "react-dom": "19.2.4",

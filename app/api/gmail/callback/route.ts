@@ -27,14 +27,27 @@ export async function GET(request: NextRequest) {
       access_token?: string;
       refresh_token?: string;
     };
-    if (!tokenResponse.ok || !tokens.access_token)
+    if (!tokenResponse.ok || !tokens.access_token) {
+      console.error(
+        '[gmail-oauth] token exchange failed',
+        tokenResponse.status,
+        tokens
+      );
       return NextResponse.redirect(failureUrl);
+    }
 
     const profileResponse = await fetch(
       'https://gmail.googleapis.com/gmail/v1/users/me/profile',
       { headers: { Authorization: `Bearer ${tokens.access_token}` } }
     );
-    if (!profileResponse.ok) return NextResponse.redirect(failureUrl);
+    if (!profileResponse.ok) {
+      console.error(
+        '[gmail-oauth] profile fetch failed',
+        profileResponse.status,
+        await profileResponse.text()
+      );
+      return NextResponse.redirect(failureUrl);
+    }
 
     const response = NextResponse.redirect(
       new URL('/integrations?gmail=connected', request.url)
@@ -55,7 +68,8 @@ export async function GET(request: NextRequest) {
       }
     );
     return response;
-  } catch {
+  } catch (error) {
+    console.error('[gmail-oauth] callback error', error);
     return NextResponse.redirect(failureUrl);
   }
 }

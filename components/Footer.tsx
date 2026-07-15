@@ -1,3 +1,4 @@
+import { Sparkles } from 'lucide-react';
 import React from 'react';
 
 export const Footer: React.FC = () => {
@@ -8,19 +9,7 @@ export const Footer: React.FC = () => {
         <div className="col-span-2 space-y-3 text-left">
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-tr from-purple-600 to-cyan-500 shadow-[0_0_10px_rgba(139,92,246,0.2)]">
-              <svg
-                className="w-4 h-4 text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2.5}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9.813 15.904L9 21L14.907 18m4.917-11.904a9.043 9.043 0 01-1.39 12.28 9.043 9.043 0 01-12.28-1.39l1.39-1.39a7.043 7.043 0 009.5 1.08l1.39-1.39z"
-                />
-              </svg>
+              <Sparkles className="size-4 text-white" aria-hidden="true" />
             </div>
             <span className="text-base font-bold text-white tracking-tight">
               OmniMind.ai

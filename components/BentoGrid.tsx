@@ -1,6 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import {
+  Bot,
+  ClipboardCheck,
+  LockKeyhole,
+  Network,
+  Search,
+  ShieldCheck,
+} from 'lucide-react';
 import { PlatformIcon } from './Icons';
 
 interface SearchResult {
@@ -136,19 +144,7 @@ export const BentoGrid: React.FC = () => {
 
           <div>
             <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 mb-6">
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                />
-              </svg>
+              <Network className="size-5" aria-hidden="true" />
             </div>
             <h3 className="text-xl font-bold text-white">
               Central Intelligence Hub
@@ -186,19 +182,7 @@ export const BentoGrid: React.FC = () => {
         <div className="rounded-3xl bg-glass p-6 md:p-8 flex flex-col justify-between border border-white/10 min-h-95 group bg-glass-hover">
           <div>
             <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 mb-6">
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
-                />
-              </svg>
+              <ClipboardCheck className="size-5" aria-hidden="true" />
             </div>
             <h3 className="text-xl font-bold text-white">Smart Reminders</h3>
             <p className="mt-2 text-zinc-400 text-sm leading-relaxed">
@@ -243,19 +227,7 @@ export const BentoGrid: React.FC = () => {
         <div className="rounded-3xl bg-glass p-6 md:p-8 flex flex-col justify-between border border-white/10 min-h-95 group bg-glass-hover">
           <div>
             <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 mb-6">
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
+              <Bot className="size-5" aria-hidden="true" />
             </div>
             <h3 className="text-xl font-bold text-white">Cross-App Search</h3>
             <p className="mt-2 text-zinc-400 text-sm leading-relaxed font-sans">
@@ -275,19 +247,10 @@ export const BentoGrid: React.FC = () => {
                 placeholder="Type to filter..."
                 className="w-full rounded-lg border border-white/10 bg-[#050505] py-1.5 pl-8 pr-3 text-xs text-zinc-200 placeholder-zinc-500 focus:border-cyan-500/50 focus:outline-none"
               />
-              <svg
-                className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-zinc-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
+              <Search
+                className="absolute left-2.5 top-2.5 size-3.5 text-zinc-500"
+                aria-hidden="true"
+              />
             </div>
 
             {/* Dynamic search results list */}
@@ -322,36 +285,16 @@ export const BentoGrid: React.FC = () => {
         {/* Card 4: Security & Privacy (Large) */}
         <div className="md:col-span-2 rounded-3xl bg-glass p-6 md:p-8 flex flex-col justify-between border border-white/10 min-h-95 relative overflow-hidden group">
           <div className="absolute -bottom-8 -right-8 p-8 w-1/3 h-1/2 opacity-15 pointer-events-none">
-            <svg
-              className="w-full h-full text-cyan-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+            <ShieldCheck
+              className="size-full text-cyan-400"
               strokeWidth={1}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-              />
-            </svg>
+              aria-hidden="true"
+            />
           </div>
 
           <div>
             <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 mb-6">
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                />
-              </svg>
+              <LockKeyhole className="size-5" aria-hidden="true" />
             </div>
             <h3 className="text-xl font-bold text-white">
               Military-Grade Encryption &amp; Compliance

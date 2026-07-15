@@ -1,10 +1,11 @@
 'use client';
 
 import Image from 'next/image';
-import { CheckCircle, GearSix, LinkSimple } from '@phosphor-icons/react';
+import { CircleCheck, Settings, Link2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { AppShell } from '@/components/DashboardShell';
 import { IntegrationSettingsModal } from '@/components/IntegrationSettingsModal';
+import { WhatsAppConnectModal } from '@/components/WhatsAppConnectModal';
 import { insforge } from '@/lib/insforge';
 
 type Integration = {
@@ -120,6 +121,8 @@ export function IntegrationsPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [selected, setSelected] = useState<Integration | null>(null);
   const [updatingPlatform, setUpdatingPlatform] = useState<string | null>(null);
+  const [waModalOpen, setWaModalOpen] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadConnections() {
@@ -133,48 +136,109 @@ export function IntegrationsPage() {
         .select('platform, status')
         .eq('user_id', user.id);
 
-      const storedConnections = (data ?? []).reduce<ConnectionMap>(
-        (result, record) => {
-          result[String(record.platform)] = record.status as ConnectionStatus;
-          return result;
-        },
-        {}
-      );
+      const storedConnections: ConnectionMap = {};
+      for (const record of data ?? [])
+        storedConnections[String(record.platform)] =
+          record.status as ConnectionStatus;
 
-      // Gmail returns from the OAuth callback with ?gmail=connected — persist and clean the URL.
+      // Gmail returns from /api/gmail/callback with ?gmail=connected. The auth
+      // session survives the redirect, so persist the connection to InsForge
+      // here (the callback runs server-side and can't reach the user's DB).
       if (typeof window !== 'undefined') {
         const params = new URLSearchParams(window.location.search);
         if (params.get('gmail') === 'connected') {
           const now = new Date().toISOString();
-          const hasRecord = storedConnections.gmail !== undefined;
-          if (hasRecord)
-            await insforge.database
-              .from('user_integrations')
-              .update({ status: 'connected', updated_at: now })
-              .eq('user_id', user.id)
-              .eq('platform', 'gmail');
-          else
-            await insforge.database.from('user_integrations').insert([
-              {
-                user_id: user.id,
-                platform: 'gmail',
-                status: 'connected',
-                updated_at: now,
-              },
-            ]);
-          storedConnections.gmail = 'connected';
+          const hasGmail = storedConnections.gmail !== undefined;
+          const { error } = hasGmail
+            ? await insforge.database
+                .from('user_integrations')
+                .update({ status: 'connected', updated_at: now })
+                .eq('user_id', user.id)
+                .eq('platform', 'gmail')
+            : await insforge.database.from('user_integrations').insert([
+                {
+                  user_id: user.id,
+                  platform: 'gmail',
+                  status: 'connected',
+                  updated_at: now,
+                },
+              ]);
+          if (!error) storedConnections.gmail = 'connected';
         }
         if (params.has('gmail'))
           window.history.replaceState({}, '', '/integrations');
       }
+
+      // If WhatsApp is marked connected but the server has no live socket (e.g.
+      // after a restart), pinging status re-spawns it from the saved creds.
+      if (storedConnections.whatsapp === 'connected') {
+        void fetch(
+          `/api/whatsapp/status?userId=${encodeURIComponent(user.id)}`
+        );
+      }
+
       setConnections(storedConnections);
     }
 
     void loadConnections();
   }, []);
+  async function persistStatus(platform: string, status: ConnectionStatus) {
+    if (!userId) return;
+    const now = new Date().toISOString();
+    const hasRecord = Object.prototype.hasOwnProperty.call(
+      connections,
+      platform
+    );
+    const { error } = hasRecord
+      ? await insforge.database
+          .from('user_integrations')
+          .update({ status, updated_at: now })
+          .eq('user_id', userId)
+          .eq('platform', platform)
+      : await insforge.database
+          .from('user_integrations')
+          .insert([{ user_id: userId, platform, status, updated_at: now }]);
+    if (!error)
+      setConnections((current) => ({ ...current, [platform]: status }));
+  }
+
+  async function onWhatsAppConnected() {
+    setWaModalOpen(false);
+    await persistStatus('whatsapp', 'connected');
+    setToast('WhatsApp connected');
+    window.setTimeout(() => setToast(null), 4000);
+  }
 
   async function toggleConnection(platform: string) {
     if (!userId || updatingPlatform) return;
+
+    // WhatsApp uses a real Baileys pairing-code connection. Connecting opens an
+    // in-app dialog (the modal drives it); disconnecting tears down the session.
+    if (platform === 'whatsapp') {
+      if (connections.whatsapp === 'connected') {
+        setUpdatingPlatform('whatsapp');
+        await fetch('/api/whatsapp/disconnect', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId }),
+        });
+        await persistStatus('whatsapp', 'disconnected');
+        setUpdatingPlatform(null);
+      } else {
+        setWaModalOpen(true);
+      }
+      return;
+    }
+
+    // Gmail disconnect clears the encrypted server session cookie as well as
+    // the InsForge status row.
+    if (platform === 'gmail' && connections.gmail === 'connected') {
+      setUpdatingPlatform('gmail');
+      await fetch('/api/gmail/disconnect', { method: 'POST' });
+      await persistStatus('gmail', 'disconnected');
+      setUpdatingPlatform(null);
+      return;
+    }
 
     // Gmail uses a real Google OAuth connection scoped to the signed-in user.
     // The consent screen is opened client-side; only /api/gmail/callback runs server-side.
@@ -194,7 +258,7 @@ export function IntegrationsPage() {
         prompt: 'consent',
         state: userId,
       }).toString();
-      window.location.href = authorizationUrl.toString();
+      window.location.assign(authorizationUrl.toString());
       return;
     }
 
@@ -233,7 +297,7 @@ export function IntegrationsPage() {
         <section className="flex flex-col justify-between gap-5 rounded-3xl bg-slate-950 p-6 text-white sm:flex-row sm:items-end sm:p-8">
           <div>
             <span className="grid size-12 place-items-center rounded-2xl bg-emerald-500">
-              <LinkSimple size={27} weight="bold" aria-hidden="true" />
+              <Link2 size={27} aria-hidden="true" />
             </span>
             <h2 className="mt-6 text-3xl font-bold tracking-tight sm:text-4xl">
               Connect your workspaces
@@ -254,15 +318,15 @@ export function IntegrationsPage() {
             return (
               <article
                 key={integration.id}
-                className="dashboard-card flex min-h-[310px] flex-col rounded-3xl border border-slate-200 bg-white p-6"
+                className="dashboard-card flex min-h-77.5 flex-col rounded-3xl border border-slate-200 bg-white p-6"
               >
                 <div className="flex justify-between">
                   <span className="grid size-10 place-items-center rounded-xl bg-slate-100 text-emerald-600">
-                    <LinkSimple size={21} weight="bold" aria-hidden="true" />
+                    <Link2 size={21} aria-hidden="true" />
                   </span>
                   {isConnected && (
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-700">
-                      <CheckCircle size={14} weight="fill" aria-hidden="true" />
+                      <CircleCheck size={14} aria-hidden="true" />
                       Connected
                     </span>
                   )}
@@ -278,8 +342,8 @@ export function IntegrationsPage() {
                       height={72}
                       className={
                         integration.id === 'whatsapp'
-                          ? 'size-[72px] scale-[2.1] object-contain'
-                          : 'size-[72px] object-contain'
+                          ? 'size-18 scale-[2.1] object-contain'
+                          : 'size-18 object-contain'
                       }
                     />
                   </span>
@@ -296,7 +360,7 @@ export function IntegrationsPage() {
                       className="grid size-11 place-items-center rounded-xl border border-slate-200 text-slate-600 transition hover:bg-slate-50 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500"
                       aria-label={`${integration.name} settings`}
                     >
-                      <GearSix size={21} weight="bold" aria-hidden="true" />
+                      <Settings size={21} aria-hidden="true" />
                     </button>
                   )}
                   <button
@@ -320,7 +384,24 @@ export function IntegrationsPage() {
       {selected && (
         <IntegrationSettingsModal
           integration={selected}
+          userId={userId}
           onClose={() => setSelected(null)}
+        />
+      )}
+      {toast && (
+        <div
+          className="fixed bottom-6 right-6 z-60 flex items-center gap-3 rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white shadow-xl shadow-emerald-950/20"
+          role="status"
+        >
+          <CircleCheck size={20} aria-hidden="true" />
+          {toast}
+        </div>
+      )}{' '}
+      {waModalOpen && userId && (
+        <WhatsAppConnectModal
+          userId={userId}
+          onClose={() => setWaModalOpen(false)}
+          onConnected={() => void onWhatsAppConnected()}
         />
       )}
     </AppShell>

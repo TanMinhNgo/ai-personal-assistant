@@ -1,5 +1,7 @@
 'use client';
 
+import { ChevronDown } from 'lucide-react';
+
 import React, { useState } from 'react';
 
 export const FaqAccordion: React.FC = () => {
@@ -52,19 +54,10 @@ export const FaqAccordion: React.FC = () => {
                   className="flex w-full items-center justify-between px-6 py-5 text-left text-sm font-semibold text-zinc-200 hover:text-white transition-colors"
                 >
                   <span>{faq.q}</span>
-                  <svg
+                  <ChevronDown
                     className={`h-4.5 w-4.5 text-zinc-500 transition-transform duration-200 ${isOpen ? 'rotate-180 text-purple-400' : ''}`}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2.5}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
+                    aria-hidden="true"
+                  />
                 </button>
                 {isOpen && (
                   <div className="px-6 pb-5 text-xs text-zinc-400 leading-relaxed border-t border-white/5 pt-3 bg-white/1 text-left">

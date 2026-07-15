@@ -144,29 +144,49 @@ export const mcpConfigs: Record<string, McpConfig> = {
     searchPlaceholder: 'Search chats',
     tools: [
       {
-        name: 'whatsapp_list_chats',
-        description: 'List active chats and groups',
-        args: '{ archived?: boolean }',
+        name: 'whatsapp_fetch_recent',
+        description: 'Fetch recent messages across chats',
+        args: '{ limit?: number }',
       },
       {
-        name: 'whatsapp_get_messages',
-        description: 'Retrieve messages from a chat',
+        name: 'whatsapp_read_history',
+        description: 'Read chat history for a conversation',
         args: '{ chatId: string, limit?: number }',
       },
       {
-        name: 'whatsapp_search_messages',
-        description: 'Search messages across chats',
+        name: 'whatsapp_send_message',
+        description: 'Send a message to a chat',
+        args: '{ chatId: string, text: string }',
+      },
+      {
+        name: 'whatsapp_search_chats',
+        description: 'Search chats and conversations',
         args: '{ q: string }',
       },
       {
-        name: 'whatsapp_create_draft',
-        description: 'Draft a reply for a chat',
-        args: '{ chatId: string, body: string }',
+        name: 'whatsapp_summarize',
+        description: 'Summarize a conversation',
+        args: '{ chatId: string }',
       },
       {
-        name: 'whatsapp_set_notification',
-        description: 'Update the notification rule for a chat',
-        args: '{ chatId: string, muted: boolean }',
+        name: 'whatsapp_get_contact',
+        description: 'Get contact details',
+        args: '{ jid: string }',
+      },
+      {
+        name: 'whatsapp_list_groups',
+        description: 'List groups you belong to',
+        args: '{ }',
+      },
+      {
+        name: 'whatsapp_fetch_group',
+        description: 'Fetch messages from a group',
+        args: '{ groupId: string, limit?: number }',
+      },
+      {
+        name: 'whatsapp_send_group',
+        description: 'Send a message to a group',
+        args: '{ groupId: string, text: string }',
       },
     ],
     messages: [
@@ -211,13 +231,13 @@ export const mcpConfigs: Record<string, McpConfig> = {
       },
     ],
     guide: {
-      pkg: '@modelcontextprotocol/server-whatsapp',
-      apiName: 'WhatsApp Business API',
+      pkg: 'baileys',
+      apiName: 'WhatsApp Web (Baileys, unofficial)',
       console: {
-        label: 'Meta for Developers',
-        url: 'https://developers.facebook.com',
+        label: 'Baileys documentation',
+        url: 'https://github.com/WhiskeySockets/Baileys',
       },
-      credsEnv: 'WHATSAPP_CREDENTIALS',
+      credsEnv: 'WHATSAPP_SESSION_SECRET',
     },
   },
 

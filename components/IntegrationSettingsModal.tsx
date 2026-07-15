@@ -2,14 +2,16 @@
 
 import Image from 'next/image';
 import {
-  MagnifyingGlass,
-  PaperPlaneTilt,
+  Check,
+  LoaderCircle,
+  Search,
+  Send,
   Plus,
   Terminal,
   X,
-} from '@phosphor-icons/react';
-import { useState } from 'react';
-import { getMcpConfig } from '@/lib/integration-mcp';
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { getMcpConfig, type InboxMessage } from '@/lib/integration-mcp';
 
 type Integration = { id: string; name: string; logo: string };
 
@@ -17,25 +19,62 @@ const RECIPIENT = 'you@omnisync.ai';
 
 export function IntegrationSettingsModal({
   integration,
+  userId,
   onClose,
 }: {
   integration: Integration;
+  userId?: string | null;
   onClose: () => void;
 }) {
   const config = getMcpConfig(integration.id);
   const isWhatsApp = integration.id === 'whatsapp';
+  // Platforms that pull a real inbox from the connected account.
+  const liveEndpoint =
+    integration.id === 'gmail'
+      ? '/api/gmail/messages'
+      : integration.id === 'whatsapp' && userId
+        ? `/api/whatsapp/messages?userId=${encodeURIComponent(userId)}`
+        : null;
   const tabs = [
     'Interactive Inbox Console',
     `Available MCP Tools (${config.tools.length})`,
     'MCP Connection Guide',
   ];
   const [activeTab, setActiveTab] = useState(0);
-  const [activeMessageId, setActiveMessageId] = useState(
+  const [liveMessages, setLiveMessages] = useState<InboxMessage[] | null>(null);
+  const [loadingInbox, setLoadingInbox] = useState(Boolean(liveEndpoint));
+  const [activeMessageId, setActiveMessageId] = useState<string | undefined>(
     config.messages[Math.min(1, config.messages.length - 1)]?.id
   );
+
+  // Gmail / WhatsApp show real inbox data pulled from the connected account.
+  useEffect(() => {
+    if (!liveEndpoint) return;
+    let cancelled = false;
+    fetch(liveEndpoint)
+      .then((response) =>
+        response.ok ? response.json() : Promise.reject(response)
+      )
+      .then((payload: { messages?: InboxMessage[] }) => {
+        if (cancelled) return;
+        const messages = payload.messages ?? [];
+        setLiveMessages(messages);
+        if (messages.length) setActiveMessageId(messages[0].id);
+      })
+      .catch(() => {
+        if (!cancelled) setLiveMessages([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingInbox(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [liveEndpoint]);
+
+  const messages = liveMessages ?? (liveEndpoint ? [] : config.messages);
   const activeMessage =
-    config.messages.find((message) => message.id === activeMessageId) ??
-    config.messages[0];
+    messages.find((message) => message.id === activeMessageId) ?? messages[0];
 
   return (
     <div
@@ -92,7 +131,7 @@ export function IntegrationSettingsModal({
             className="grid size-10 shrink-0 place-items-center rounded-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500"
             aria-label="Close"
           >
-            <X size={22} weight="bold" aria-hidden="true" />
+            <X size={22} aria-hidden="true" />
           </button>
         </header>
 
@@ -115,19 +154,27 @@ export function IntegrationSettingsModal({
           })}
         </nav>
 
-        <div className="min-h-0 flex-1 overflow-y-auto">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
           {activeTab === 0 && (
             <InboxConsole
               config={config}
+              messages={messages}
               activeMessage={activeMessage}
               activeMessageId={activeMessageId}
               setActiveMessageId={setActiveMessageId}
               integration={integration}
+              loading={loadingInbox}
             />
           )}
-          {activeTab === 1 && <ToolSchema config={config} />}
+          {activeTab === 1 && (
+            <div className="min-h-0 flex-1 overflow-y-auto">
+              <ToolSchema config={config} />
+            </div>
+          )}
           {activeTab === 2 && (
-            <ConnectionGuide config={config} integration={integration} />
+            <div className="min-h-0 flex-1 overflow-y-auto">
+              <ConnectionGuide config={config} integration={integration} />
+            </div>
           )}
         </div>
       </div>
@@ -137,119 +184,152 @@ export function IntegrationSettingsModal({
 
 function InboxConsole({
   config,
+  messages,
   activeMessage,
   activeMessageId,
   setActiveMessageId,
   integration,
+  loading,
 }: {
   config: ReturnType<typeof getMcpConfig>;
-  activeMessage: ReturnType<typeof getMcpConfig>['messages'][number];
+  messages: InboxMessage[];
+  activeMessage?: InboxMessage;
   activeMessageId?: string;
   setActiveMessageId: (id: string) => void;
   integration: Integration;
+  loading: boolean;
 }) {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,300px)_1fr_minmax(0,340px)]">
+    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto lg:grid lg:grid-cols-[minmax(0,300px)_1fr_minmax(0,340px)] lg:overflow-hidden">
       {/* Inbox list */}
-      <div className="flex flex-col gap-3 border-b border-slate-200 p-4 lg:border-b-0 lg:border-r">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col border-b border-slate-200 lg:h-full lg:min-h-0 lg:border-b-0 lg:border-r">
+        <div className="flex items-center gap-2 p-4 pb-3">
           <span className="flex flex-1 items-center gap-2 rounded-xl bg-slate-50 px-3 py-2.5 text-sm text-slate-500">
-            <MagnifyingGlass size={17} weight="bold" aria-hidden="true" />
+            <Search size={17} aria-hidden="true" />
             <span>{config.searchPlaceholder}</span>
           </span>
           <button
             type="button"
             className="inline-flex items-center gap-1.5 rounded-xl bg-violet-500 px-3 py-2.5 text-sm font-bold text-white transition hover:bg-violet-400"
           >
-            <Plus size={16} weight="bold" aria-hidden="true" />
+            <Plus size={16} aria-hidden="true" />
             {config.composeLabel}
           </button>
         </div>
-        <ul className="space-y-2.5">
-          {config.messages.map((message) => {
-            const active = message.id === activeMessageId;
-            return (
-              <li key={message.id}>
-                <button
-                  type="button"
-                  onClick={() => setActiveMessageId(message.id)}
-                  className={`w-full rounded-2xl border p-3.5 text-left transition ${active ? 'border-violet-300 bg-violet-50' : 'border-slate-200 bg-white hover:bg-slate-50'}`}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="truncate text-sm font-bold text-slate-950">
-                      {message.sender}
-                    </span>
-                    <span className="shrink-0 text-xs text-slate-400">
-                      {message.time}
-                    </span>
-                  </div>
-                  <p className="mt-1 truncate text-sm font-semibold text-slate-700">
-                    {message.subject}
-                  </p>
-                  <p className="mt-1 line-clamp-2 text-xs leading-4 text-slate-500">
-                    {message.preview}
-                  </p>
-                  {message.tags.length > 0 && (
-                    <div className="mt-2 flex flex-wrap gap-1.5">
-                      {message.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className={`rounded-md px-1.5 py-0.5 text-[10px] font-bold ${tag === 'URGENT' ? 'bg-rose-100 text-rose-700' : 'bg-sky-100 text-sky-700'}`}
-                        >
-                          {tag}
-                        </span>
-                      ))}
+        <div className="px-4 pb-4 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
+          {loading && (
+            <p className="rounded-2xl bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
+              Loading your inbox…
+            </p>
+          )}
+          {!loading && messages.length === 0 && (
+            <p className="rounded-2xl bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
+              No messages found in your inbox.
+            </p>
+          )}
+          <ul className="space-y-2.5">
+            {messages.map((message) => {
+              const active = message.id === activeMessageId;
+              return (
+                <li key={message.id}>
+                  <button
+                    type="button"
+                    onClick={() => setActiveMessageId(message.id)}
+                    className={`w-full rounded-2xl border p-3.5 text-left transition ${active ? 'border-violet-300 bg-violet-50' : 'border-slate-200 bg-white hover:bg-slate-50'}`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="truncate text-sm font-bold text-slate-950">
+                        {message.sender}
+                      </span>
+                      <span className="shrink-0 text-xs text-slate-400">
+                        {message.time}
+                      </span>
                     </div>
-                  )}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+                    <p className="mt-1 truncate text-sm font-semibold text-slate-700">
+                      {message.subject}
+                    </p>
+                    <p className="mt-1 line-clamp-2 text-xs leading-4 text-slate-500">
+                      {message.preview}
+                    </p>
+                    {message.tags.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {message.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className={`rounded-md px-1.5 py-0.5 text-[10px] font-bold ${tag === 'URGENT' ? 'bg-rose-100 text-rose-700' : 'bg-sky-100 text-sky-700'}`}
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       </div>
 
       {/* Message detail */}
-      <div className="flex flex-col justify-between bg-slate-950 p-6 text-slate-200">
-        <div>
-          <div className="flex items-start justify-between gap-4">
-            <h3 className="text-lg font-bold text-white">
-              {activeMessage.subject}
-            </h3>
-            <span className="shrink-0 text-xs text-slate-400">
-              {activeMessage.time}
-            </span>
-          </div>
-          <p className="mt-3 text-sm text-slate-400">
-            From: {activeMessage.signature.name} &lt;{activeMessage.handle}&gt;
+      <div className="flex flex-col justify-between bg-slate-950 p-6 text-slate-200 lg:h-full lg:min-h-0 lg:overflow-y-auto">
+        {activeMessage ? (
+          <>
+            <div>
+              <div className="flex items-start justify-between gap-4">
+                <h3 className="text-lg font-bold text-white">
+                  {activeMessage.subject}
+                </h3>
+                <span className="shrink-0 text-xs text-slate-400">
+                  {activeMessage.time}
+                </span>
+              </div>
+              <p className="mt-3 text-sm text-slate-400">
+                From: {activeMessage.signature.name} &lt;{activeMessage.handle}
+                &gt;
+              </p>
+              <p className="text-sm text-slate-400">
+                To: You &lt;{RECIPIENT}&gt;
+              </p>
+              <div className="mt-6 space-y-4 text-sm leading-6 text-slate-300">
+                {activeMessage.body.map((paragraph, index) => (
+                  <p key={index}>{paragraph}</p>
+                ))}
+                {activeMessage.signature.role && (
+                  <p className="pt-2 text-slate-400">
+                    Best regards,
+                    <br />
+                    {activeMessage.signature.name}
+                    <br />
+                    {activeMessage.signature.role}
+                  </p>
+                )}
+              </div>
+            </div>
+            {integration.id === 'gmail' ? (
+              <GmailReply key={activeMessage.id} messageId={activeMessage.id} />
+            ) : (
+              <button
+                type="button"
+                className="mt-8 inline-flex items-center justify-center gap-2 self-center rounded-xl border border-white/15 px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+              >
+                <Send size={17} aria-hidden="true" />
+                Reply to Email
+              </button>
+            )}
+          </>
+        ) : (
+          <p className="grid flex-1 place-items-center text-sm text-slate-400">
+            {loading ? 'Loading…' : 'Select a message to preview it here.'}
           </p>
-          <p className="text-sm text-slate-400">To: You &lt;{RECIPIENT}&gt;</p>
-          <div className="mt-6 space-y-4 text-sm leading-6 text-slate-300">
-            {activeMessage.body.map((paragraph, index) => (
-              <p key={index}>{paragraph}</p>
-            ))}
-            <p className="pt-2 text-slate-400">
-              Best regards,
-              <br />
-              {activeMessage.signature.name}
-              <br />
-              {activeMessage.signature.role}
-            </p>
-          </div>
-        </div>
-        <button
-          type="button"
-          className="mt-8 inline-flex items-center justify-center gap-2 self-center rounded-xl border border-white/15 px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
-        >
-          <PaperPlaneTilt size={17} weight="bold" aria-hidden="true" />
-          Reply to Email
-        </button>
+        )}
       </div>
 
       {/* Live JSON-RPC console */}
-      <div className="flex flex-col border-t border-slate-800 bg-[#0a0e17] lg:border-t-0 lg:border-l">
+      <div className="flex flex-col border-t border-slate-800 bg-[#0a0e17] lg:h-full lg:min-h-0 lg:border-t-0 lg:border-l">
         <div className="flex items-center justify-between border-b border-slate-800 px-4 py-3">
           <span className="flex items-center gap-2 text-xs font-bold tracking-wider text-slate-300">
-            <Terminal size={15} weight="bold" aria-hidden="true" />
+            <Terminal size={15} aria-hidden="true" />
             LIVE JSON-RPC CONSOLE
           </span>
           <span className="text-[10px] font-semibold tracking-wider text-slate-500">
@@ -257,8 +337,101 @@ function InboxConsole({
           </span>
         </div>
         <pre className="flex-1 overflow-auto p-4 font-mono text-[11px] leading-5">
-          {buildConsole(config, integration)}
+          {buildConsole(config, messages, integration)}
         </pre>
+      </div>
+    </div>
+  );
+}
+
+function GmailReply({ messageId }: { messageId: string }) {
+  const [open, setOpen] = useState(false);
+  const [text, setText] = useState('');
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function send() {
+    setSending(true);
+    setError(null);
+    try {
+      const response = await fetch('/api/gmail/reply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messageId, body: text }),
+      });
+      const data = (await response.json()) as { ok?: boolean; error?: string };
+      if (!response.ok || !data.ok) {
+        setError(data.error ?? 'Could not send the reply.');
+      } else {
+        setSent(true);
+        setOpen(false);
+        setText('');
+      }
+    } catch {
+      setError('Network error. Please try again.');
+    }
+    setSending(false);
+  }
+
+  if (sent) {
+    return (
+      <p className="mt-8 flex items-center justify-center gap-2 text-sm font-semibold text-emerald-400">
+        <Check size={17} aria-hidden="true" />
+        Reply sent
+      </p>
+    );
+  }
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="mt-8 inline-flex items-center justify-center gap-2 self-center rounded-xl border border-white/15 px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+      >
+        <Send size={17} aria-hidden="true" />
+        Reply to Email
+      </button>
+    );
+  }
+
+  return (
+    <div className="mt-8 space-y-3">
+      <textarea
+        autoFocus
+        rows={4}
+        value={text}
+        onChange={(event) => setText(event.target.value)}
+        placeholder="Write your reply…"
+        className="w-full resize-y rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-violet-400 focus-visible:ring-2 focus-visible:ring-violet-500/30"
+      />
+      {error && <p className="text-sm text-rose-300">{error}</p>}
+      <div className="flex justify-end gap-2">
+        <button
+          type="button"
+          onClick={() => setOpen(false)}
+          className="rounded-xl border border-white/15 px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          onClick={() => void send()}
+          disabled={sending || !text.trim()}
+          className="inline-flex items-center gap-2 rounded-xl bg-violet-500 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-violet-400 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {sending ? (
+            <LoaderCircle
+              size={16}
+              className="animate-spin"
+              aria-hidden="true"
+            />
+          ) : (
+            <Send size={16} aria-hidden="true" />
+          )}
+          {sending ? 'Sending…' : 'Send reply'}
+        </button>
       </div>
     </div>
   );
@@ -266,9 +439,11 @@ function InboxConsole({
 
 function buildConsole(
   config: ReturnType<typeof getMcpConfig>,
+  messages: InboxMessage[],
   integration: Integration
 ): string {
   const [first, second] = config.tools;
+  const sampleId = messages[0]?.id ?? '—';
   const lines: string[] = [];
   lines.push(`--> SEND REQUEST (${first.name})              5:53:02 PM`);
   lines.push('{');
@@ -286,7 +461,7 @@ function buildConsole(
   lines.push('      {');
   lines.push('        "type": "text",');
   lines.push(
-    `        "text": "{ \\"${config.entityPlural}\\": [ { \\"id\\": \\"${config.messages[0]?.id}\\" } ] }"`
+    `        "text": "{ \\"${config.entityPlural}\\": [ { \\"id\\": \\"${sampleId}\\" } ] }"`
   );
   lines.push('      }');
   lines.push('    ]');
@@ -298,7 +473,7 @@ function buildConsole(
     lines.push('{');
     lines.push('  "jsonrpc": "2.0",');
     lines.push(`  "method": "${second.name}",`);
-    lines.push(`  "params": { "id": "${config.messages[0]?.id}" },`);
+    lines.push(`  "params": { "id": "${sampleId}" },`);
     lines.push('  "id": 585');
     lines.push('}');
   }
@@ -329,7 +504,7 @@ function ToolSchema({ config }: { config: ReturnType<typeof getMcpConfig> }) {
               </code>
             </div>
             <p className="mt-1 text-sm text-slate-500">{tool.description}</p>
-            <code className="mt-3 block break-words rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-mono text-xs text-slate-600">
+            <code className="mt-3 block wrap-break-word rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-mono text-xs text-slate-600">
               arguments: {tool.args}
             </code>
           </li>
@@ -438,7 +613,7 @@ function Step({ n }: { n: number }) {
 
 function Code({ children }: { children: React.ReactNode }) {
   return (
-    <code className="mt-2 block break-words rounded-xl border border-slate-800 bg-[#0a0e17] px-4 py-3 font-mono text-xs text-emerald-300">
+    <code className="mt-2 block wrap-break-word rounded-xl border border-slate-800 bg-[#0a0e17] px-4 py-3 font-mono text-xs text-emerald-300">
       {children}
     </code>
   );

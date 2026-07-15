@@ -1,4 +1,5 @@
 import React from 'react';
+import { ArrowRight } from 'lucide-react';
 import { PlatformIcon } from './Icons';
 
 export const Hero: React.FC = () => {
@@ -31,19 +32,7 @@ export const Hero: React.FC = () => {
           className="flex items-center justify-center rounded-xl bg-linear-to-r from-purple-600 to-indigo-600 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_4px_20px_rgba(139,92,246,0.3)] transition-all hover:scale-[1.02] hover:shadow-[0_4px_25px_rgba(139,92,246,0.5)] active:scale-[0.98]"
         >
           Connect My Accounts
-          <svg
-            className="ml-2 w-4 h-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2.5}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M13 7l5 5m0 0l-5 5m5-5H6"
-            />
-          </svg>
+          <ArrowRight className="ml-2 size-4" aria-hidden="true" />
         </a>
         <a
           href="#sandbox"
