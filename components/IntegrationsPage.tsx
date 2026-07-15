@@ -154,16 +154,14 @@ export function IntegrationsPage() {
               .eq('user_id', user.id)
               .eq('platform', 'gmail');
           else
-            await insforge.database
-              .from('user_integrations')
-              .insert([
-                {
-                  user_id: user.id,
-                  platform: 'gmail',
-                  status: 'connected',
-                  updated_at: now,
-                },
-              ]);
+            await insforge.database.from('user_integrations').insert([
+              {
+                user_id: user.id,
+                platform: 'gmail',
+                status: 'connected',
+                updated_at: now,
+              },
+            ]);
           storedConnections.gmail = 'connected';
         }
         if (params.has('gmail'))
