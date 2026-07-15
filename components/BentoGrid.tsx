@@ -120,7 +120,7 @@ export const BentoGrid: React.FC = () => {
       {/* BENTO GRID */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Card 1: Central Intelligence Hub (Large) */}
-        <div className="md:col-span-2 rounded-3xl bg-glass p-6 md:p-8 flex flex-col justify-between border border-white/10 min-h-[380px] relative overflow-hidden group">
+        <div className="md:col-span-2 rounded-3xl bg-glass p-6 md:p-8 flex flex-col justify-between border border-white/10 min-h-95 relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-8 w-1/2 h-full opacity-20 pointer-events-none">
             {/* Background graphic grid */}
             <div className="relative w-full h-full flex items-center justify-center">
@@ -128,9 +128,9 @@ export const BentoGrid: React.FC = () => {
                 <div className="w-16 h-16 rounded-full bg-purple-600/30 blur-md" />
               </div>
               {/* Simulated streaming lines */}
-              <div className="absolute w-48 h-[1px] bg-gradient-to-r from-transparent via-cyan-500 to-transparent rotate-45" />
-              <div className="absolute w-48 h-[1px] bg-gradient-to-r from-transparent via-purple-500 to-transparent -rotate-45" />
-              <div className="absolute w-48 h-[1px] bg-gradient-to-r from-transparent via-emerald-500 to-transparent rotate-90" />
+              <div className="absolute w-48 h-px bg-linear-to-r from-transparent via-cyan-500 to-transparent rotate-45" />
+              <div className="absolute w-48 h-px bg-linear-to-r from-transparent via-purple-500 to-transparent -rotate-45" />
+              <div className="absolute w-48 h-px bg-linear-to-r from-transparent via-emerald-500 to-transparent rotate-90" />
             </div>
           </div>
 
@@ -183,7 +183,7 @@ export const BentoGrid: React.FC = () => {
         </div>
 
         {/* Card 2: AI Action Reminders (Medium) */}
-        <div className="rounded-3xl bg-glass p-6 md:p-8 flex flex-col justify-between border border-white/10 min-h-[380px] group bg-glass-hover">
+        <div className="rounded-3xl bg-glass p-6 md:p-8 flex flex-col justify-between border border-white/10 min-h-95 group bg-glass-hover">
           <div>
             <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 mb-6">
               <svg
@@ -240,7 +240,7 @@ export const BentoGrid: React.FC = () => {
         </div>
 
         {/* Card 3: Unified Search (Medium) */}
-        <div className="rounded-3xl bg-glass p-6 md:p-8 flex flex-col justify-between border border-white/10 min-h-[380px] group bg-glass-hover">
+        <div className="rounded-3xl bg-glass p-6 md:p-8 flex flex-col justify-between border border-white/10 min-h-95 group bg-glass-hover">
           <div>
             <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 mb-6">
               <svg
@@ -291,7 +291,7 @@ export const BentoGrid: React.FC = () => {
             </div>
 
             {/* Dynamic search results list */}
-            <div className="max-h-[120px] overflow-y-auto space-y-1.5 pr-1 border-t border-white/5 pt-2">
+            <div className="max-h-30 overflow-y-auto space-y-1.5 pr-1 border-t border-white/5 pt-2">
               {searchResults.length > 0 ? (
                 searchResults.map((res, i) => (
                   <div
@@ -320,7 +320,7 @@ export const BentoGrid: React.FC = () => {
         </div>
 
         {/* Card 4: Security & Privacy (Large) */}
-        <div className="md:col-span-2 rounded-3xl bg-glass p-6 md:p-8 flex flex-col justify-between border border-white/10 min-h-[380px] relative overflow-hidden group">
+        <div className="md:col-span-2 rounded-3xl bg-glass p-6 md:p-8 flex flex-col justify-between border border-white/10 min-h-95 relative overflow-hidden group">
           <div className="absolute -bottom-8 -right-8 p-8 w-1/3 h-1/2 opacity-15 pointer-events-none">
             <svg
               className="w-full h-full text-cyan-400"

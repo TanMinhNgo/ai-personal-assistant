@@ -28,7 +28,7 @@ export const Hero: React.FC = () => {
       <div className="mt-10 flex flex-col sm:flex-row gap-4 w-full justify-center max-w-md">
         <a
           href="#demo"
-          className="flex items-center justify-center rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_4px_20px_rgba(139,92,246,0.3)] transition-all hover:scale-[1.02] hover:shadow-[0_4px_25px_rgba(139,92,246,0.5)] active:scale-[0.98]"
+          className="flex items-center justify-center rounded-xl bg-linear-to-r from-purple-600 to-indigo-600 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_4px_20px_rgba(139,92,246,0.3)] transition-all hover:scale-[1.02] hover:shadow-[0_4px_25px_rgba(139,92,246,0.5)] active:scale-[0.98]"
         >
           Connect My Accounts
           <svg
@@ -55,7 +55,7 @@ export const Hero: React.FC = () => {
 
       {/* App Mockup Preview */}
       <div className="mt-16 w-full max-w-5xl rounded-2xl border border-white/10 bg-zinc-950/40 p-3 shadow-2xl backdrop-blur-2xl animate-float-slow">
-        <div className="rounded-xl border border-white/5 overflow-hidden bg-black/80 aspect-[16/9] flex flex-col">
+        <div className="rounded-xl border border-white/5 overflow-hidden bg-black/80 aspect-video flex flex-col">
           {/* Window controls header */}
           <div className="flex h-10 w-full items-center justify-between border-b border-white/5 bg-[#080808] px-4">
             <div className="flex gap-1.5">

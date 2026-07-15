@@ -67,7 +67,7 @@ export const FaqAccordion: React.FC = () => {
                   </svg>
                 </button>
                 {isOpen && (
-                  <div className="px-6 pb-5 text-xs text-zinc-400 leading-relaxed border-t border-white/5 pt-3 bg-white/[0.01] text-left">
+                  <div className="px-6 pb-5 text-xs text-zinc-400 leading-relaxed border-t border-white/5 pt-3 bg-white/1 text-left">
                     {faq.a}
                   </div>
                 )}

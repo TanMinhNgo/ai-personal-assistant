@@ -241,7 +241,7 @@ export const DemoSimulator: React.FC = () => {
           {/* Central Demonstration Box */}
           <div className="lg:col-span-9 grid grid-cols-1 md:grid-cols-11 gap-6 items-center">
             {/* Raw Message Card */}
-            <div className="md:col-span-5 rounded-2xl border border-white/5 bg-black p-5 h-full flex flex-col justify-between min-h-[350px]">
+            <div className="md:col-span-5 rounded-2xl border border-white/5 bg-black p-5 h-full flex flex-col justify-between min-h-87.5">
               <div>
                 <div className="flex items-center justify-between border-b border-white/5 pb-3 mb-4">
                   <span className="text-xs font-semibold text-zinc-500 uppercase tracking-widest">
@@ -268,7 +268,7 @@ export const DemoSimulator: React.FC = () => {
                 </div>
 
                 {/* Body input content */}
-                <pre className="text-xs text-zinc-400 font-mono whitespace-pre-wrap leading-relaxed bg-[#020202] p-3.5 rounded-lg border border-white/5 overflow-y-auto max-h-[220px]">
+                <pre className="text-xs text-zinc-400 font-mono whitespace-pre-wrap leading-relaxed bg-[#020202] p-3.5 rounded-lg border border-white/5 overflow-y-auto max-h-55">
                   {selectedData.rawInput}
                 </pre>
               </div>
@@ -314,7 +314,7 @@ export const DemoSimulator: React.FC = () => {
             </div>
 
             {/* Structured Output Card */}
-            <div className="md:col-span-5 rounded-2xl border border-purple-500/20 bg-[#09090d] p-5 h-full flex flex-col justify-between min-h-[350px] shadow-[0_0_30px_rgba(139,92,246,0.05)] relative overflow-hidden">
+            <div className="md:col-span-5 rounded-2xl border border-purple-500/20 bg-[#09090d] p-5 h-full flex flex-col justify-between min-h-87.5 shadow-[0_0_30px_rgba(139,92,246,0.05)] relative overflow-hidden">
               {/* Shimmer loading mask */}
               {isProcessing && (
                 <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] flex items-center justify-center z-10">

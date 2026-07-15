@@ -143,12 +143,12 @@ export const SandboxPlayground: React.FC = () => {
                 value={sandboxInput}
                 onChange={(e) => setSandboxInput(e.target.value)}
                 placeholder="Type anything here..."
-                className="w-full flex-1 rounded-xl border border-white/10 bg-[#050505] p-3 text-xs text-zinc-200 placeholder-zinc-500 focus:border-purple-500/50 focus:outline-none min-h-[160px] resize-none"
+                className="w-full flex-1 rounded-xl border border-white/10 bg-[#050505] p-3 text-xs text-zinc-200 placeholder-zinc-500 focus:border-purple-500/50 focus:outline-none min-h-40 resize-none"
               />
               <button
                 onClick={handleSandboxSimulate}
                 disabled={isSandboxLoading}
-                className="mt-4 w-full rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 py-3 text-xs font-bold text-white shadow-lg transition-transform hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50"
+                className="mt-4 w-full rounded-xl bg-linear-to-r from-purple-600 to-cyan-500 py-3 text-xs font-bold text-white shadow-lg transition-transform hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50"
               >
                 {isSandboxLoading
                   ? 'Summarizing with AI...'
@@ -157,7 +157,7 @@ export const SandboxPlayground: React.FC = () => {
             </div>
 
             {/* Parsed Output */}
-            <div className="rounded-xl border border-purple-500/10 bg-[#07070b] p-4 flex flex-col justify-between min-h-[220px] text-left">
+            <div className="rounded-xl border border-purple-500/10 bg-[#07070b] p-4 flex flex-col justify-between min-h-55 text-left">
               {isSandboxLoading ? (
                 <div className="flex-1 flex flex-col items-center justify-center gap-3">
                   <div className="w-8 h-8 rounded-full border-2 border-purple-500 border-t-transparent animate-spin" />

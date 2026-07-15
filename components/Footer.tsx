@@ -7,7 +7,7 @@ export const Footer: React.FC = () => {
         {/* Brand Info */}
         <div className="col-span-2 space-y-3 text-left">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-tr from-purple-600 to-cyan-500 shadow-[0_0_10px_rgba(139,92,246,0.2)]">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-tr from-purple-600 to-cyan-500 shadow-[0_0_10px_rgba(139,92,246,0.2)]">
               <svg
                 className="w-4 h-4 text-white"
                 fill="none"
