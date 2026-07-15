@@ -155,16 +155,14 @@ export function IntegrationsPage() {
                 .update({ status: 'connected', updated_at: now })
                 .eq('user_id', user.id)
                 .eq('platform', 'gmail')
-            : await insforge.database
-                .from('user_integrations')
-                .insert([
-                  {
-                    user_id: user.id,
-                    platform: 'gmail',
-                    status: 'connected',
-                    updated_at: now,
-                  },
-                ]);
+            : await insforge.database.from('user_integrations').insert([
+                {
+                  user_id: user.id,
+                  platform: 'gmail',
+                  status: 'connected',
+                  updated_at: now,
+                },
+              ]);
           if (!error) storedConnections.gmail = 'connected';
         }
         if (params.has('gmail'))
@@ -174,7 +172,9 @@ export function IntegrationsPage() {
       // If WhatsApp is marked connected but the server has no live socket (e.g.
       // after a restart), pinging status re-spawns it from the saved creds.
       if (storedConnections.whatsapp === 'connected') {
-        void fetch(`/api/whatsapp/status?userId=${encodeURIComponent(user.id)}`);
+        void fetch(
+          `/api/whatsapp/status?userId=${encodeURIComponent(user.id)}`
+        );
       }
 
       setConnections(storedConnections);
@@ -185,7 +185,10 @@ export function IntegrationsPage() {
   async function persistStatus(platform: string, status: ConnectionStatus) {
     if (!userId) return;
     const now = new Date().toISOString();
-    const hasRecord = Object.prototype.hasOwnProperty.call(connections, platform);
+    const hasRecord = Object.prototype.hasOwnProperty.call(
+      connections,
+      platform
+    );
     const { error } = hasRecord
       ? await insforge.database
           .from('user_integrations')
@@ -195,7 +198,8 @@ export function IntegrationsPage() {
       : await insforge.database
           .from('user_integrations')
           .insert([{ user_id: userId, platform, status, updated_at: now }]);
-    if (!error) setConnections((current) => ({ ...current, [platform]: status }));
+    if (!error)
+      setConnections((current) => ({ ...current, [platform]: status }));
   }
 
   async function onWhatsAppConnected() {
@@ -392,7 +396,8 @@ export function IntegrationsPage() {
           <CircleCheck size={20} aria-hidden="true" />
           {toast}
         </div>
-      )}      {waModalOpen && userId && (
+      )}{' '}
+      {waModalOpen && userId && (
         <WhatsAppConnectModal
           userId={userId}
           onClose={() => setWaModalOpen(false)}

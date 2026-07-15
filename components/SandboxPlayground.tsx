@@ -204,7 +204,11 @@ export const SandboxPlayground: React.FC = () => {
                 </div>
               ) : (
                 <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
-                  <FileText className="mb-2 size-8 text-zinc-600" strokeWidth={1.5} aria-hidden="true" />
+                  <FileText
+                    className="mb-2 size-8 text-zinc-600"
+                    strokeWidth={1.5}
+                    aria-hidden="true"
+                  />
                   <span className="text-xs text-zinc-500">
                     Parsed variables, lists, and context will appear here.
                   </span>

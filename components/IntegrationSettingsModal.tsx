@@ -52,7 +52,9 @@ export function IntegrationSettingsModal({
     if (!liveEndpoint) return;
     let cancelled = false;
     fetch(liveEndpoint)
-      .then((response) => (response.ok ? response.json() : Promise.reject(response)))
+      .then((response) =>
+        response.ok ? response.json() : Promise.reject(response)
+      )
       .then((payload: { messages?: InboxMessage[] }) => {
         if (cancelled) return;
         const messages = payload.messages ?? [];
@@ -226,45 +228,45 @@ function InboxConsole({
             </p>
           )}
           <ul className="space-y-2.5">
-          {messages.map((message) => {
-            const active = message.id === activeMessageId;
-            return (
-              <li key={message.id}>
-                <button
-                  type="button"
-                  onClick={() => setActiveMessageId(message.id)}
-                  className={`w-full rounded-2xl border p-3.5 text-left transition ${active ? 'border-violet-300 bg-violet-50' : 'border-slate-200 bg-white hover:bg-slate-50'}`}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="truncate text-sm font-bold text-slate-950">
-                      {message.sender}
-                    </span>
-                    <span className="shrink-0 text-xs text-slate-400">
-                      {message.time}
-                    </span>
-                  </div>
-                  <p className="mt-1 truncate text-sm font-semibold text-slate-700">
-                    {message.subject}
-                  </p>
-                  <p className="mt-1 line-clamp-2 text-xs leading-4 text-slate-500">
-                    {message.preview}
-                  </p>
-                  {message.tags.length > 0 && (
-                    <div className="mt-2 flex flex-wrap gap-1.5">
-                      {message.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className={`rounded-md px-1.5 py-0.5 text-[10px] font-bold ${tag === 'URGENT' ? 'bg-rose-100 text-rose-700' : 'bg-sky-100 text-sky-700'}`}
-                        >
-                          {tag}
-                        </span>
-                      ))}
+            {messages.map((message) => {
+              const active = message.id === activeMessageId;
+              return (
+                <li key={message.id}>
+                  <button
+                    type="button"
+                    onClick={() => setActiveMessageId(message.id)}
+                    className={`w-full rounded-2xl border p-3.5 text-left transition ${active ? 'border-violet-300 bg-violet-50' : 'border-slate-200 bg-white hover:bg-slate-50'}`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="truncate text-sm font-bold text-slate-950">
+                        {message.sender}
+                      </span>
+                      <span className="shrink-0 text-xs text-slate-400">
+                        {message.time}
+                      </span>
                     </div>
-                  )}
-                </button>
-              </li>
-            );
-          })}
+                    <p className="mt-1 truncate text-sm font-semibold text-slate-700">
+                      {message.subject}
+                    </p>
+                    <p className="mt-1 line-clamp-2 text-xs leading-4 text-slate-500">
+                      {message.preview}
+                    </p>
+                    {message.tags.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {message.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className={`rounded-md px-1.5 py-0.5 text-[10px] font-bold ${tag === 'URGENT' ? 'bg-rose-100 text-rose-700' : 'bg-sky-100 text-sky-700'}`}
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         </div>
       </div>
@@ -419,7 +421,15 @@ function GmailReply({ messageId }: { messageId: string }) {
           disabled={sending || !text.trim()}
           className="inline-flex items-center gap-2 rounded-xl bg-violet-500 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-violet-400 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {sending ? <LoaderCircle size={16} className="animate-spin" aria-hidden="true" /> : <Send size={16} aria-hidden="true" />}
+          {sending ? (
+            <LoaderCircle
+              size={16}
+              className="animate-spin"
+              aria-hidden="true"
+            />
+          ) : (
+            <Send size={16} aria-hidden="true" />
+          )}
           {sending ? 'Sending…' : 'Send reply'}
         </button>
       </div>

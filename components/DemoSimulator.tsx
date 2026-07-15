@@ -286,7 +286,19 @@ export const DemoSimulator: React.FC = () => {
             {/* Processing Connector arrow */}
             <div className="md:col-span-1 flex flex-col items-center justify-center gap-2 py-4 md:py-0">
               <div className="relative flex items-center justify-center w-10 h-10 rounded-full border border-purple-500/20 bg-purple-500/5">
-                <>{isProcessing ? <LoaderCircle className="size-5 animate-spin text-purple-400" aria-hidden="true" /> : <ChevronsRight className="size-5 text-purple-400" aria-hidden="true" />}</>
+                <>
+                  {isProcessing ? (
+                    <LoaderCircle
+                      className="size-5 animate-spin text-purple-400"
+                      aria-hidden="true"
+                    />
+                  ) : (
+                    <ChevronsRight
+                      className="size-5 text-purple-400"
+                      aria-hidden="true"
+                    />
+                  )}
+                </>
                 <div className="absolute inset-0 rounded-full bg-purple-500/10 blur" />
               </div>
               <span className="text-[9px] font-bold text-purple-400 uppercase tracking-widest">
@@ -324,7 +336,11 @@ export const DemoSimulator: React.FC = () => {
               <div>
                 <div className="flex items-center justify-between border-b border-white/5 pb-3 mb-4">
                   <span className="text-xs font-bold text-purple-400 uppercase tracking-widest flex items-center gap-1.5">
-                    <Zap className="size-3.5" fill="currentColor" aria-hidden="true" />
+                    <Zap
+                      className="size-3.5"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    />
                     AI Synthesis Output
                   </span>
                   <span className="text-[10px] text-zinc-500 font-medium">

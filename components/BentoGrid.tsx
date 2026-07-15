@@ -1,7 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Bot, ClipboardCheck, LockKeyhole, Network, Search, ShieldCheck } from 'lucide-react';
+import {
+  Bot,
+  ClipboardCheck,
+  LockKeyhole,
+  Network,
+  Search,
+  ShieldCheck,
+} from 'lucide-react';
 import { PlatformIcon } from './Icons';
 
 interface SearchResult {
@@ -240,7 +247,10 @@ export const BentoGrid: React.FC = () => {
                 placeholder="Type to filter..."
                 className="w-full rounded-lg border border-white/10 bg-[#050505] py-1.5 pl-8 pr-3 text-xs text-zinc-200 placeholder-zinc-500 focus:border-cyan-500/50 focus:outline-none"
               />
-              <Search className="absolute left-2.5 top-2.5 size-3.5 text-zinc-500" aria-hidden="true" />
+              <Search
+                className="absolute left-2.5 top-2.5 size-3.5 text-zinc-500"
+                aria-hidden="true"
+              />
             </div>
 
             {/* Dynamic search results list */}
@@ -275,7 +285,11 @@ export const BentoGrid: React.FC = () => {
         {/* Card 4: Security & Privacy (Large) */}
         <div className="md:col-span-2 rounded-3xl bg-glass p-6 md:p-8 flex flex-col justify-between border border-white/10 min-h-95 relative overflow-hidden group">
           <div className="absolute -bottom-8 -right-8 p-8 w-1/3 h-1/2 opacity-15 pointer-events-none">
-            <ShieldCheck className="size-full text-cyan-400" strokeWidth={1} aria-hidden="true" />
+            <ShieldCheck
+              className="size-full text-cyan-400"
+              strokeWidth={1}
+              aria-hidden="true"
+            />
           </div>
 
           <div>

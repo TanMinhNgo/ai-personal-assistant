@@ -28,7 +28,11 @@ export async function GET(request: NextRequest) {
       refresh_token?: string;
     };
     if (!tokenResponse.ok || !tokens.access_token) {
-      console.error('[gmail-oauth] token exchange failed', tokenResponse.status, tokens);
+      console.error(
+        '[gmail-oauth] token exchange failed',
+        tokenResponse.status,
+        tokens
+      );
       return NextResponse.redirect(failureUrl);
     }
 
@@ -37,7 +41,11 @@ export async function GET(request: NextRequest) {
       { headers: { Authorization: `Bearer ${tokens.access_token}` } }
     );
     if (!profileResponse.ok) {
-      console.error('[gmail-oauth] profile fetch failed', profileResponse.status, await profileResponse.text());
+      console.error(
+        '[gmail-oauth] profile fetch failed',
+        profileResponse.status,
+        await profileResponse.text()
+      );
       return NextResponse.redirect(failureUrl);
     }
 

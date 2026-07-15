@@ -5,7 +5,9 @@ import type { InboxMessage } from '@/lib/integration-mcp';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-type BriefRequest = { items?: { platform: string; messages: InboxMessage[] }[] };
+type BriefRequest = {
+  items?: { platform: string; messages: InboxMessage[] }[];
+};
 
 const responseSchema = {
   type: Type.OBJECT,
@@ -50,16 +52,25 @@ const responseSchema = {
   required: ['stats', 'brief', 'priorities'],
 };
 
-const emptyBrief = { stats: { important: 0, priority: 0, followUps: 0 }, brief: [], priorities: [] };
+const emptyBrief = {
+  stats: { important: 0, priority: 0, followUps: 0 },
+  brief: [],
+  priorities: [],
+};
 
 export async function POST(request: Request) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    return NextResponse.json({ error: 'AI brief unavailable. Set GEMINI_API_KEY to enable it.' }, { status: 503 });
+    return NextResponse.json(
+      { error: 'AI brief unavailable. Set GEMINI_API_KEY to enable it.' },
+      { status: 503 }
+    );
   }
 
   const { items } = (await request.json().catch(() => ({}))) as BriefRequest;
-  const total = items?.reduce((count, item) => count + (item.messages?.length ?? 0), 0) ?? 0;
+  const total =
+    items?.reduce((count, item) => count + (item.messages?.length ?? 0), 0) ??
+    0;
   if (!items?.length || total === 0) return NextResponse.json(emptyBrief);
 
   // Trim the payload so the prompt stays small and cheap.
@@ -99,6 +110,9 @@ export async function POST(request: Request) {
     return NextResponse.json(JSON.parse(response.text ?? '{}'));
   } catch (error) {
     console.error('[dashboard/brief] gemini error', error);
-    return NextResponse.json({ error: 'Could not generate the brief.' }, { status: 502 });
+    return NextResponse.json(
+      { error: 'Could not generate the brief.' },
+      { status: 502 }
+    );
   }
 }

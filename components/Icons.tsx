@@ -1,6 +1,5 @@
 import { Inbox, Mail, MessageCircle, Send } from 'lucide-react';
 
-
 export const PlatformIcon: React.FC<{
   platform: string;
   className?: string;

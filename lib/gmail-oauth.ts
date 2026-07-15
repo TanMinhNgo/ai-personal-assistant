@@ -45,13 +45,33 @@ export function createGmailFetcher(connection: GmailConnection) {
   let refreshedToken: string | null = null;
 
   async function gapi(url: string, init?: RequestInit): Promise<Response> {
-    const withAuth = (): RequestInit => ({ ...init, headers: { ...(init?.headers ?? {}), Authorization: `Bearer ${accessToken}` } });
+    const withAuth = (): RequestInit => ({
+      ...init,
+      headers: {
+        ...(init?.headers ?? {}),
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
     let response = await fetch(url, withAuth());
     if (response.status === 401 && connection.refreshToken) {
       const { clientId, clientSecret } = getGmailOAuthConfig();
-      const refreshResponse = await fetch('https://oauth2.googleapis.com/token', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ client_id: clientId, client_secret: clientSecret, refresh_token: connection.refreshToken, grant_type: 'refresh_token' }) });
+      const refreshResponse = await fetch(
+        'https://oauth2.googleapis.com/token',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({
+            client_id: clientId,
+            client_secret: clientSecret,
+            refresh_token: connection.refreshToken,
+            grant_type: 'refresh_token',
+          }),
+        }
+      );
       if (refreshResponse.ok) {
-        const data = (await refreshResponse.json()) as { access_token?: string };
+        const data = (await refreshResponse.json()) as {
+          access_token?: string;
+        };
         if (data.access_token) {
           accessToken = data.access_token;
           refreshedToken = data.access_token;
