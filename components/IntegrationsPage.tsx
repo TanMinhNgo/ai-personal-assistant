@@ -5,7 +5,6 @@ import { CircleCheck, Settings, Link2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { AppShell } from '@/components/DashboardShell';
 import { IntegrationSettingsModal } from '@/components/IntegrationSettingsModal';
-import { WhatsAppConnectModal } from '@/components/WhatsAppConnectModal';
 import { insforge } from '@/lib/insforge';
 
 type Integration = {
@@ -31,17 +30,6 @@ const integrations: Integration[] = [
       'List and apply labels',
       'Create and update drafts',
       'Send approved drafts and emails',
-    ],
-  },
-  {
-    id: 'whatsapp',
-    name: 'WhatsApp',
-    logo: '/whatsapp.png',
-    description: 'Keep important customer and team conversations in one view.',
-    actions: [
-      'Review conversations',
-      'Create reply drafts',
-      'Manage notification rules',
     ],
   },
   {
@@ -121,8 +109,6 @@ export function IntegrationsPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [selected, setSelected] = useState<Integration | null>(null);
   const [updatingPlatform, setUpdatingPlatform] = useState<string | null>(null);
-  const [waModalOpen, setWaModalOpen] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadConnections() {
@@ -169,14 +155,6 @@ export function IntegrationsPage() {
           window.history.replaceState({}, '', '/integrations');
       }
 
-      // If WhatsApp is marked connected but the server has no live socket (e.g.
-      // after a restart), pinging status re-spawns it from the saved creds.
-      if (storedConnections.whatsapp === 'connected') {
-        void fetch(
-          `/api/whatsapp/status?userId=${encodeURIComponent(user.id)}`
-        );
-      }
-
       setConnections(storedConnections);
     }
 
@@ -202,33 +180,8 @@ export function IntegrationsPage() {
       setConnections((current) => ({ ...current, [platform]: status }));
   }
 
-  async function onWhatsAppConnected() {
-    setWaModalOpen(false);
-    await persistStatus('whatsapp', 'connected');
-    setToast('WhatsApp connected');
-    window.setTimeout(() => setToast(null), 4000);
-  }
-
   async function toggleConnection(platform: string) {
     if (!userId || updatingPlatform) return;
-
-    // WhatsApp uses a real Baileys pairing-code connection. Connecting opens an
-    // in-app dialog (the modal drives it); disconnecting tears down the session.
-    if (platform === 'whatsapp') {
-      if (connections.whatsapp === 'connected') {
-        setUpdatingPlatform('whatsapp');
-        await fetch('/api/whatsapp/disconnect', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId }),
-        });
-        await persistStatus('whatsapp', 'disconnected');
-        setUpdatingPlatform(null);
-      } else {
-        setWaModalOpen(true);
-      }
-      return;
-    }
 
     // Gmail disconnect clears the encrypted server session cookie as well as
     // the InsForge status row.
@@ -332,19 +285,13 @@ export function IntegrationsPage() {
                   )}
                 </div>
                 <div className="grid flex-1 place-items-center py-5">
-                  <span
-                    className={`grid h-20 place-items-center rounded-2xl ${integration.id === 'whatsapp' ? 'w-44 bg-[#25D366]' : ''}`}
-                  >
+                  <span className="grid h-20 place-items-center rounded-2xl">
                     <Image
                       src={integration.logo}
                       alt={`${integration.name} logo`}
                       width={72}
                       height={72}
-                      className={
-                        integration.id === 'whatsapp'
-                          ? 'size-18 scale-[2.1] object-contain'
-                          : 'size-18 object-contain'
-                      }
+                      className="size-18 object-contain"
                     />
                   </span>
                 </div>
@@ -384,24 +331,7 @@ export function IntegrationsPage() {
       {selected && (
         <IntegrationSettingsModal
           integration={selected}
-          userId={userId}
           onClose={() => setSelected(null)}
-        />
-      )}
-      {toast && (
-        <div
-          className="fixed bottom-6 right-6 z-60 flex items-center gap-3 rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white shadow-xl shadow-emerald-950/20"
-          role="status"
-        >
-          <CircleCheck size={20} aria-hidden="true" />
-          {toast}
-        </div>
-      )}{' '}
-      {waModalOpen && userId && (
-        <WhatsAppConnectModal
-          userId={userId}
-          onClose={() => setWaModalOpen(false)}
-          onConnected={() => void onWhatsAppConnected()}
         />
       )}
     </AppShell>

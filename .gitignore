@@ -36,9 +36,8 @@ yarn-error.log*
 # vercel
 .vercel
 
-# whatsapp (baileys) encrypted session store
-/.wa-sessions/
-
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+.trigger

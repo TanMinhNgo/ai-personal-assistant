@@ -19,22 +19,14 @@ const RECIPIENT = 'you@omnisync.ai';
 
 export function IntegrationSettingsModal({
   integration,
-  userId,
   onClose,
 }: {
   integration: Integration;
-  userId?: string | null;
   onClose: () => void;
 }) {
   const config = getMcpConfig(integration.id);
-  const isWhatsApp = integration.id === 'whatsapp';
   // Platforms that pull a real inbox from the connected account.
-  const liveEndpoint =
-    integration.id === 'gmail'
-      ? '/api/gmail/messages'
-      : integration.id === 'whatsapp' && userId
-        ? `/api/whatsapp/messages?userId=${encodeURIComponent(userId)}`
-        : null;
+  const liveEndpoint = integration.id === 'gmail' ? '/api/gmail/messages' : null;
   const tabs = [
     'Interactive Inbox Console',
     `Available MCP Tools (${config.tools.length})`,
@@ -47,7 +39,7 @@ export function IntegrationSettingsModal({
     config.messages[Math.min(1, config.messages.length - 1)]?.id
   );
 
-  // Gmail / WhatsApp show real inbox data pulled from the connected account.
+  // Gmail shows real inbox data pulled from the connected account.
   useEffect(() => {
     if (!liveEndpoint) return;
     let cancelled = false;
@@ -91,20 +83,8 @@ export function IntegrationSettingsModal({
       >
         <header className="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-5 sm:px-8">
           <div className="flex items-center gap-3">
-            <span
-              className={`grid size-12 shrink-0 place-items-center overflow-hidden rounded-2xl ${isWhatsApp ? 'bg-[#25D366]' : 'bg-slate-100'}`}
-            >
-              <Image
-                src={integration.logo}
-                alt=""
-                width={30}
-                height={30}
-                className={
-                  isWhatsApp
-                    ? 'size-8 scale-[1.7] object-contain'
-                    : 'size-8 object-contain'
-                }
-              />
+            <span className="grid size-12 shrink-0 place-items-center overflow-hidden rounded-2xl bg-slate-100">
+              <Image src={integration.logo} alt="" width={30} height={30} className="size-8 object-contain" />
             </span>
             <div>
               <div className="flex items-center gap-2.5">

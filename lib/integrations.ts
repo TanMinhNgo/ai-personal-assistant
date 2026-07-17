@@ -10,12 +10,6 @@ export type PlatformMeta = {
 
 export const PLATFORMS: PlatformMeta[] = [
   { id: 'gmail', name: 'Gmail', logo: '/gmail.png' },
-  {
-    id: 'whatsapp',
-    name: 'WhatsApp',
-    logo: '/whatsapp.png',
-    tileClass: 'bg-[#25D366]',
-  },
   { id: 'slack', name: 'Slack', logo: '/slack.png' },
   { id: 'outlook', name: 'Outlook', logo: '/email.png' },
   { id: 'discord', name: 'Discord', logo: '/discord.png' },

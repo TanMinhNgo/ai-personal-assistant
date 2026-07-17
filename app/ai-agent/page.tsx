@@ -1,5 +1,10 @@
-import { DashboardTabPage } from '@/components/DashboardShell';
+import { AppShell } from '@/components/DashboardShell';
+import { AiAgentPage } from '@/components/AiAgentPage';
 
 export default function Page() {
-  return <DashboardTabPage tab="ai-agent" />;
+  return (
+    <AppShell title="AI Agent">
+      <AiAgentPage />
+    </AppShell>
+  );
 }

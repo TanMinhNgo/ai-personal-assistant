@@ -13,17 +13,19 @@
   "dependencies": {
     "@google/genai": "^2.11.0",
     "@insforge/sdk": "^1.4.4",
-    "baileys": "^7.0.0-rc13",
+    "@trigger.dev/sdk": "4.5.4",
     "lucide-react": "^1.24.0",
     "next": "16.2.10",
-    "pino": "^10.3.1",
     "prettier": "^3.9.5",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
     "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@trigger.dev/build": "4.5.4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
