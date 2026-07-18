@@ -6,7 +6,9 @@ export const dynamic = 'force-dynamic';
 
 const suggestionsSchema = {
   type: Type.OBJECT,
-  properties: { suggestions: { type: Type.ARRAY, items: { type: Type.STRING } } },
+  properties: {
+    suggestions: { type: Type.ARRAY, items: { type: Type.STRING } },
+  },
   required: ['suggestions'],
 };
 
@@ -16,7 +18,9 @@ export async function POST(request: Request) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return NextResponse.json({ suggestions: [] });
 
-  const { question, answer } = (await request.json().catch(() => ({}))) as SuggestRequest;
+  const { question, answer } = (await request
+    .json()
+    .catch(() => ({}))) as SuggestRequest;
   if (!answer) return NextResponse.json({ suggestions: [] });
 
   try {
@@ -34,10 +38,19 @@ export async function POST(request: Request) {
           ],
         },
       ],
-      config: { responseMimeType: 'application/json', responseSchema: suggestionsSchema, maxOutputTokens: 200, temperature: 0.7 },
+      config: {
+        responseMimeType: 'application/json',
+        responseSchema: suggestionsSchema,
+        maxOutputTokens: 200,
+        temperature: 0.7,
+      },
     });
-    const parsed = JSON.parse(response.text ?? '{}') as { suggestions?: string[] };
-    return NextResponse.json({ suggestions: (parsed.suggestions ?? []).slice(0, 3) });
+    const parsed = JSON.parse(response.text ?? '{}') as {
+      suggestions?: string[];
+    };
+    return NextResponse.json({
+      suggestions: (parsed.suggestions ?? []).slice(0, 3),
+    });
   } catch (error) {
     console.error('[ai-agent/suggestions] gemini error', error);
     return NextResponse.json({ suggestions: [] });

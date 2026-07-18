@@ -16,17 +16,25 @@ const PERSONA =
 export async function POST(request: Request) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    return new Response('AI agent unavailable. Set GEMINI_API_KEY to enable it.', { status: 503, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
+    return new Response(
+      'AI agent unavailable. Set GEMINI_API_KEY to enable it.',
+      { status: 503, headers: { 'Content-Type': 'text/plain; charset=utf-8' } }
+    );
   }
 
-  const { messages, context } = (await request.json().catch(() => ({}))) as ChatRequest;
-  if (!messages?.length) return new Response('No messages provided.', { status: 400 });
+  const { messages, context } = (await request
+    .json()
+    .catch(() => ({}))) as ChatRequest;
+  if (!messages?.length)
+    return new Response('No messages provided.', { status: 400 });
 
   const contents = messages.map((message) => ({
     role: message.role === 'assistant' ? ('model' as const) : ('user' as const),
     parts: [{ text: message.content }],
   }));
-  const systemInstruction = context ? `${PERSONA}\n\n--- CONNECTED APP DATA ---\n${context}` : PERSONA;
+  const systemInstruction = context
+    ? `${PERSONA}\n\n--- CONNECTED APP DATA ---\n${context}`
+    : PERSONA;
 
   const ai = new GoogleGenAI({ apiKey });
   const model = process.env.GEMINI_MODEL ?? 'gemini-3.1-flash-lite';
@@ -38,14 +46,22 @@ export async function POST(request: Request) {
         const result = await ai.models.generateContentStream({
           model,
           contents,
-          config: { systemInstruction, temperature: 0.4, maxOutputTokens: 1400 },
+          config: {
+            systemInstruction,
+            temperature: 0.4,
+            maxOutputTokens: 1400,
+          },
         });
         for await (const chunk of result) {
           if (chunk.text) controller.enqueue(encoder.encode(chunk.text));
         }
       } catch (error) {
         console.error('[ai-agent/chat] gemini error', error);
-        controller.enqueue(encoder.encode('\n\n_Sorry — the assistant hit an error. Please try again._'));
+        controller.enqueue(
+          encoder.encode(
+            '\n\n_Sorry — the assistant hit an error. Please try again._'
+          )
+        );
       } finally {
         controller.close();
       }

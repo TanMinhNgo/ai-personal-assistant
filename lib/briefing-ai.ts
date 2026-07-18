@@ -3,12 +3,29 @@
 import { Type } from '@google/genai';
 import type { InboxMessage } from '@/lib/integration-mcp';
 
-export const CATEGORY_KEYS = ['email', 'messages', 'mentions', 'tasks', 'followups'] as const;
+export const CATEGORY_KEYS = [
+  'email',
+  'messages',
+  'mentions',
+  'tasks',
+  'followups',
+] as const;
 export type CategoryKey = (typeof CATEGORY_KEYS)[number];
 
-export type BriefingCategory = { key: CategoryKey; count: number; summary: string };
-export type BriefingTop = { title: string; summary: string; highlights: string[] };
-export type BriefingResult = { top: BriefingTop; categories: BriefingCategory[] };
+export type BriefingCategory = {
+  key: CategoryKey;
+  count: number;
+  summary: string;
+};
+export type BriefingTop = {
+  title: string;
+  summary: string;
+  highlights: string[];
+};
+export type BriefingResult = {
+  top: BriefingTop;
+  categories: BriefingCategory[];
+};
 
 export const briefingSchema = {
   type: Type.OBJECT,
@@ -40,7 +57,11 @@ export const briefingSchema = {
 
 export type BriefingItems = { platform: string; messages: InboxMessage[] }[];
 
-export function buildBriefingPrompt(items: BriefingItems, goal?: string, categories?: string[]) {
+export function buildBriefingPrompt(
+  items: BriefingItems,
+  goal?: string,
+  categories?: string[]
+) {
   const compact = items.map((item) => ({
     platform: item.platform,
     messages: item.messages.slice(0, 8).map((message) => ({
@@ -59,7 +80,9 @@ export function buildBriefingPrompt(items: BriefingItems, goal?: string, categor
     `[${CATEGORY_KEYS.join(', ')}]. Each: key, count (integer of items in that category), summary (max 18 words).`,
     'Map emails->email, chat/DMs->messages, @-mentions->mentions, action items/todos->tasks, waiting-on replies->followups.',
     goal ? `USER GOAL/PRIORITY: ${goal}` : '',
-    categories?.length ? `ONLY produce these categories: ${categories.join(', ')}` : '',
+    categories?.length
+      ? `ONLY produce these categories: ${categories.join(', ')}`
+      : '',
     '',
     'DATA:',
     JSON.stringify(compact),

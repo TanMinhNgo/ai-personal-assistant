@@ -55,13 +55,22 @@ const prioritiesSchema = {
 export async function POST(request: Request) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    return NextResponse.json({ error: 'AI brief unavailable. Set GEMINI_API_KEY to enable it.' }, { status: 503 });
+    return NextResponse.json(
+      { error: 'AI brief unavailable. Set GEMINI_API_KEY to enable it.' },
+      { status: 503 }
+    );
   }
 
-  const { items, part = 'brief' } = (await request.json().catch(() => ({}))) as BriefRequest;
-  const total = items?.reduce((count, item) => count + (item.messages?.length ?? 0), 0) ?? 0;
+  const { items, part = 'brief' } = (await request
+    .json()
+    .catch(() => ({}))) as BriefRequest;
+  const total =
+    items?.reduce((count, item) => count + (item.messages?.length ?? 0), 0) ??
+    0;
   if (!items?.length || total === 0) {
-    return NextResponse.json(part === 'priorities' ? { priorities: [] } : { brief: [] });
+    return NextResponse.json(
+      part === 'priorities' ? { priorities: [] } : { brief: [] }
+    );
   }
 
   // Trim aggressively so the prompt stays tiny and the model responds in a few seconds.
@@ -112,6 +121,9 @@ export async function POST(request: Request) {
     return NextResponse.json(JSON.parse(response.text ?? '{}'));
   } catch (error) {
     console.error('[dashboard/brief] gemini error', error);
-    return NextResponse.json({ error: 'Could not generate the brief.' }, { status: 502 });
+    return NextResponse.json(
+      { error: 'Could not generate the brief.' },
+      { status: 502 }
+    );
   }
 }

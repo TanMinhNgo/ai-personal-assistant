@@ -14,9 +14,19 @@ type ComposeRequest = {
 
 export async function POST(request: Request) {
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return NextResponse.json({ error: 'AI compose unavailable. Set GEMINI_API_KEY to enable it.' }, { status: 503 });
+  if (!apiKey)
+    return NextResponse.json(
+      { error: 'AI compose unavailable. Set GEMINI_API_KEY to enable it.' },
+      { status: 503 }
+    );
 
-  const { channel = 'email', context = '', recipient = '', goal = '', tone = 'professional' } = (await request.json().catch(() => ({}))) as ComposeRequest;
+  const {
+    channel = 'email',
+    context = '',
+    recipient = '',
+    goal = '',
+    tone = 'professional',
+  } = (await request.json().catch(() => ({}))) as ComposeRequest;
 
   const prompt = [
     `Draft a ${channel === 'email' ? 'concise email' : 'short chat message'} in a ${tone} tone.`,
@@ -41,6 +51,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ draft: (response.text ?? '').trim() });
   } catch (error) {
     console.error('[briefing/compose] gemini error', error);
-    return NextResponse.json({ error: 'Could not draft the message.' }, { status: 502 });
+    return NextResponse.json(
+      { error: 'Could not draft the message.' },
+      { status: 502 }
+    );
   }
 }

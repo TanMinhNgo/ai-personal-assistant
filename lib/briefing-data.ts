@@ -26,22 +26,43 @@ export async function fetchMessages(url: string): Promise<InboxMessage[]> {
   }
 }
 
-export async function gatherItems(userId: string, connectedIds: string[]): Promise<GatheredItems> {
+export async function gatherItems(
+  userId: string,
+  connectedIds: string[]
+): Promise<GatheredItems> {
   const liveIds = connectedIds.filter((id) => LIVE_PLATFORMS[id]);
   const results = await Promise.all(
-    liveIds.map(async (id) => ({ platform: id, messages: await fetchMessages(LIVE_PLATFORMS[id]) }))
+    liveIds.map(async (id) => ({
+      platform: id,
+      messages: await fetchMessages(LIVE_PLATFORMS[id]),
+    }))
   );
   return results.filter((item) => item.messages.length > 0);
 }
 
-export async function writeSnapshot(userId: string, items: GatheredItems, connected: string[]) {
-  const record = { data: JSON.stringify({ items, connected }), updated_at: new Date().toISOString() };
+export async function writeSnapshot(
+  userId: string,
+  items: GatheredItems,
+  connected: string[]
+) {
+  const record = {
+    data: JSON.stringify({ items, connected }),
+    updated_at: new Date().toISOString(),
+  };
   try {
-    const { data: existing } = await insforge.database.from('user_message_snapshots').select('user_id').eq('user_id', userId);
+    const { data: existing } = await insforge.database
+      .from('user_message_snapshots')
+      .select('user_id')
+      .eq('user_id', userId);
     if (existing && existing.length > 0) {
-      await insforge.database.from('user_message_snapshots').update(record).eq('user_id', userId);
+      await insforge.database
+        .from('user_message_snapshots')
+        .update(record)
+        .eq('user_id', userId);
     } else {
-      await insforge.database.from('user_message_snapshots').insert([{ user_id: userId, ...record }]);
+      await insforge.database
+        .from('user_message_snapshots')
+        .insert([{ user_id: userId, ...record }]);
     }
   } catch {
     /* table missing — snapshot is best-effort */
@@ -49,8 +70,16 @@ export async function writeSnapshot(userId: string, items: GatheredItems, connec
 }
 
 // Rough instant counts shown before the AI briefing returns (the AI overrides them).
-export function computeCategoryCounts(items: GatheredItems): Record<CategoryKey, number> {
-  const counts: Record<CategoryKey, number> = { email: 0, messages: 0, mentions: 0, tasks: 0, followups: 0 };
+export function computeCategoryCounts(
+  items: GatheredItems
+): Record<CategoryKey, number> {
+  const counts: Record<CategoryKey, number> = {
+    email: 0,
+    messages: 0,
+    mentions: 0,
+    tasks: 0,
+    followups: 0,
+  };
   for (const item of items) {
     const isEmail = EMAIL_PLATFORMS.has(item.platform);
     for (const message of item.messages) {
@@ -60,7 +89,8 @@ export function computeCategoryCounts(items: GatheredItems): Record<CategoryKey,
       if (isEmail) counts.email += 1;
       else counts.messages += 1;
       if (text.includes('@')) counts.mentions += 1;
-      if (tags.includes('URGENT') || tags.includes('IMPORTANT')) counts.tasks += 1;
+      if (tags.includes('URGENT') || tags.includes('IMPORTANT'))
+        counts.tasks += 1;
       if (inbound && tags.includes('UNREAD')) counts.followups += 1;
     }
   }

@@ -2,8 +2,14 @@
 // (the cron process runs in UTC); per-user local time would need a stored offset.
 export type Frequency = 'hourly' | 'daily' | 'weekly';
 
-export function computeNextRun(frequency: Frequency, scheduledTime: string, from: Date = new Date()): Date {
-  const [hours, minutes] = scheduledTime.split(':').map((part) => Number(part) || 0);
+export function computeNextRun(
+  frequency: Frequency,
+  scheduledTime: string,
+  from: Date = new Date()
+): Date {
+  const [hours, minutes] = scheduledTime
+    .split(':')
+    .map((part) => Number(part) || 0);
   const next = new Date(from);
 
   if (frequency === 'hourly') {

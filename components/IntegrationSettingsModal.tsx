@@ -26,7 +26,8 @@ export function IntegrationSettingsModal({
 }) {
   const config = getMcpConfig(integration.id);
   // Platforms that pull a real inbox from the connected account.
-  const liveEndpoint = integration.id === 'gmail' ? '/api/gmail/messages' : null;
+  const liveEndpoint =
+    integration.id === 'gmail' ? '/api/gmail/messages' : null;
   const tabs = [
     'Interactive Inbox Console',
     `Available MCP Tools (${config.tools.length})`,
@@ -84,7 +85,13 @@ export function IntegrationSettingsModal({
         <header className="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-5 sm:px-8">
           <div className="flex items-center gap-3">
             <span className="grid size-12 shrink-0 place-items-center overflow-hidden rounded-2xl bg-slate-100">
-              <Image src={integration.logo} alt="" width={30} height={30} className="size-8 object-contain" />
+              <Image
+                src={integration.logo}
+                alt=""
+                width={30}
+                height={30}
+                className="size-8 object-contain"
+              />
             </span>
             <div>
               <div className="flex items-center gap-2.5">

@@ -19,7 +19,13 @@ import { platformLogo, platformName } from '@/lib/integrations';
 import { insforge } from '@/lib/insforge';
 
 type ChatRole = 'user' | 'assistant';
-type Message = { id: string; role: ChatRole; content: string; sources?: string[]; pending?: boolean };
+type Message = {
+  id: string;
+  role: ChatRole;
+  content: string;
+  sources?: string[];
+  pending?: boolean;
+};
 type StoredChat = { savedAt: number; messages: Message[] };
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -49,7 +55,10 @@ function loadHistory(uid: string): Message[] {
 
 function saveHistory(uid: string, messages: Message[]) {
   try {
-    localStorage.setItem(storageKey(uid), JSON.stringify({ savedAt: Date.now(), messages } satisfies StoredChat));
+    localStorage.setItem(
+      storageKey(uid),
+      JSON.stringify({ savedAt: Date.now(), messages } satisfies StoredChat)
+    );
   } catch {
     /* quota / private mode */
   }
@@ -61,7 +70,10 @@ function buildContext(items: GatheredItems): string {
     .map((group) => {
       const lines = group.messages
         .slice(0, 8)
-        .map((message) => `- [${message.tags.join(',') || 'none'}] ${message.sender} <${message.handle}>: ${message.subject} — ${message.preview}`)
+        .map(
+          (message) =>
+            `- [${message.tags.join(',') || 'none'}] ${message.sender} <${message.handle}>: ${message.subject} — ${message.preview}`
+        )
         .join('\n');
       return `## ${platformName(group.platform)} (${group.platform})\n${lines}`;
     })
@@ -94,8 +106,13 @@ export function AiAgentPage() {
       const restored = loadHistory(user.id);
       if (restored.length) setMessages(restored);
 
-      const { data: rows } = await insforge.database.from('user_integrations').select('platform, status').eq('user_id', user.id);
-      const connectedIds = (rows ?? []).filter((row) => row.status === 'connected').map((row) => String(row.platform));
+      const { data: rows } = await insforge.database
+        .from('user_integrations')
+        .select('platform, status')
+        .eq('user_id', user.id);
+      const connectedIds = (rows ?? [])
+        .filter((row) => row.status === 'connected')
+        .map((row) => String(row.platform));
       if (cancelled) return;
       setConnected(connectedIds);
 
@@ -130,11 +147,24 @@ export function AiAgentPage() {
     const trimmed = text.trim();
     if (!trimmed || streaming) return;
 
-    const userMessage: Message = { id: crypto.randomUUID(), role: 'user', content: trimmed };
+    const userMessage: Message = {
+      id: crypto.randomUUID(),
+      role: 'user',
+      content: trimmed,
+    };
     const aiId = crypto.randomUUID();
     const sources = items.map((item) => item.platform);
-    const aiMessage: Message = { id: aiId, role: 'assistant', content: '', sources, pending: true };
-    const history = [...messages, userMessage].map((message) => ({ role: message.role, content: message.content }));
+    const aiMessage: Message = {
+      id: aiId,
+      role: 'assistant',
+      content: '',
+      sources,
+      pending: true,
+    };
+    const history = [...messages, userMessage].map((message) => ({
+      role: message.role,
+      content: message.content,
+    }));
 
     setMessages((prev) => [...prev, userMessage, aiMessage]);
     setSuggestions([]);
@@ -148,8 +178,16 @@ export function AiAgentPage() {
       });
 
       if (!response.ok || !response.body) {
-        const errorText = await response.text().catch(() => 'The assistant is unavailable.');
-        setMessages((prev) => prev.map((message) => (message.id === aiId ? { ...message, content: errorText, pending: false } : message)));
+        const errorText = await response
+          .text()
+          .catch(() => 'The assistant is unavailable.');
+        setMessages((prev) =>
+          prev.map((message) =>
+            message.id === aiId
+              ? { ...message, content: errorText, pending: false }
+              : message
+          )
+        );
         return;
       }
 
@@ -161,12 +199,30 @@ export function AiAgentPage() {
         if (done) break;
         accumulated += decoder.decode(value, { stream: true });
         const current = accumulated;
-        setMessages((prev) => prev.map((message) => (message.id === aiId ? { ...message, content: current } : message)));
+        setMessages((prev) =>
+          prev.map((message) =>
+            message.id === aiId ? { ...message, content: current } : message
+          )
+        );
       }
-      setMessages((prev) => prev.map((message) => (message.id === aiId ? { ...message, pending: false } : message)));
+      setMessages((prev) =>
+        prev.map((message) =>
+          message.id === aiId ? { ...message, pending: false } : message
+        )
+      );
       void fetchSuggestions(trimmed, accumulated);
     } catch {
-      setMessages((prev) => prev.map((message) => (message.id === aiId ? { ...message, content: 'Network error. Please try again.', pending: false } : message)));
+      setMessages((prev) =>
+        prev.map((message) =>
+          message.id === aiId
+            ? {
+                ...message,
+                content: 'Network error. Please try again.',
+                pending: false,
+              }
+            : message
+        )
+      );
     } finally {
       setStreaming(false);
     }
@@ -181,7 +237,9 @@ export function AiAgentPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question, answer }),
       });
-      const data = (await response.json().catch(() => ({}))) as { suggestions?: string[] };
+      const data = (await response.json().catch(() => ({}))) as {
+        suggestions?: string[];
+      };
       setSuggestions(data.suggestions ?? []);
     } catch {
       setSuggestions([]);
@@ -204,7 +262,9 @@ export function AiAgentPage() {
   }
 
   const isEmpty = messages.length === 0;
-  const summarySignature = items.map((item) => `${item.platform}:${item.messages.length}`).join('|');
+  const summarySignature = items
+    .map((item) => `${item.platform}:${item.messages.length}`)
+    .join('|');
 
   return (
     <div className="mx-auto flex min-h-full max-w-4xl flex-col p-5 sm:p-8">
@@ -215,7 +275,9 @@ export function AiAgentPage() {
           </span>
           <div>
             <h2 className="text-xl font-bold tracking-tight">AI Agent</h2>
-            <p className="text-sm text-slate-500">Ask about your connected apps and get things done.</p>
+            <p className="text-sm text-slate-500">
+              Ask about your connected apps and get things done.
+            </p>
           </div>
         </div>
         <button
@@ -230,9 +292,16 @@ export function AiAgentPage() {
 
       {isEmpty && (
         <>
-          <RecentSummary key={summarySignature} items={items} gathering={gathering} connected={connected} />
+          <RecentSummary
+            key={summarySignature}
+            items={items}
+            gathering={gathering}
+            connected={connected}
+          />
           <div className="mt-6">
-            <p className="text-sm font-semibold text-slate-500">Quick suggestions</p>
+            <p className="text-sm font-semibold text-slate-500">
+              Quick suggestions
+            </p>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               {STARTERS.map((starter) => (
                 <button
@@ -244,7 +313,9 @@ export function AiAgentPage() {
                   <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-violet-100 text-violet-600">
                     <starter.icon size={18} aria-hidden="true" />
                   </span>
-                  <span className="text-sm font-semibold text-slate-800">{starter.text}</span>
+                  <span className="text-sm font-semibold text-slate-800">
+                    {starter.text}
+                  </span>
                 </button>
               ))}
             </div>
@@ -258,13 +329,21 @@ export function AiAgentPage() {
             <ChatMessage key={message.id} message={message} />
           ))}
           {(suggestions.length > 0 || loadingSuggestions) && !streaming && (
-            <QuickReplies suggestions={suggestions} loading={loadingSuggestions} onPick={(text) => void sendMessage(text)} />
+            <QuickReplies
+              suggestions={suggestions}
+              loading={loadingSuggestions}
+              onPick={(text) => void sendMessage(text)}
+            />
           )}
           <div ref={bottomRef} />
         </div>
       )}
 
-      <Composer disabled={streaming} gathering={gathering && !isEmpty} onSend={(text) => void sendMessage(text)} />
+      <Composer
+        disabled={streaming}
+        gathering={gathering && !isEmpty}
+        onSend={(text) => void sendMessage(text)}
+      />
     </div>
   );
 }
@@ -273,7 +352,9 @@ function ChatMessage({ message }: { message: Message }) {
   if (message.role === 'user') {
     return (
       <div className="flex justify-end">
-        <div className="max-w-[85%] rounded-3xl rounded-br-lg bg-violet-500 px-4 py-3 text-sm leading-6 text-white">{message.content}</div>
+        <div className="max-w-[85%] rounded-3xl rounded-br-lg bg-violet-500 px-4 py-3 text-sm leading-6 text-white">
+          {message.content}
+        </div>
       </div>
     );
   }
@@ -285,9 +366,15 @@ function ChatMessage({ message }: { message: Message }) {
       </span>
       <div className="min-w-0 flex-1">
         <div className="dashboard-card rounded-3xl rounded-tl-lg border border-slate-200 bg-white p-4">
-          {message.pending && !message.content ? <TypingDots /> : <Markdown>{message.content}</Markdown>}
+          {message.pending && !message.content ? (
+            <TypingDots />
+          ) : (
+            <Markdown>{message.content}</Markdown>
+          )}
         </div>
-        {!message.pending && message.sources && message.sources.length > 0 && <SourcesRow sources={message.sources} />}
+        {!message.pending && message.sources && message.sources.length > 0 && (
+          <SourcesRow sources={message.sources} />
+        )}
       </div>
     </div>
   );
@@ -298,8 +385,17 @@ function SourcesRow({ sources }: { sources: string[] }) {
     <div className="mt-2 flex flex-wrap items-center gap-1.5">
       <span className="text-xs font-medium text-slate-400">Sources:</span>
       {sources.map((id) => (
-        <span key={id} className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-600">
-          <Image src={platformLogo(id)} alt="" width={14} height={14} className="size-3.5 object-contain" />
+        <span
+          key={id}
+          className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-600"
+        >
+          <Image
+            src={platformLogo(id)}
+            alt=""
+            width={14}
+            height={14}
+            className="size-3.5 object-contain"
+          />
           {platformName(id)}
         </span>
       ))}
@@ -317,11 +413,21 @@ function TypingDots() {
   );
 }
 
-function QuickReplies({ suggestions, loading, onPick }: { suggestions: string[]; loading: boolean; onPick: (text: string) => void }) {
+function QuickReplies({
+  suggestions,
+  loading,
+  onPick,
+}: {
+  suggestions: string[];
+  loading: boolean;
+  onPick: (text: string) => void;
+}) {
   return (
     <div className="flex flex-wrap gap-2 pl-12">
       {loading && suggestions.length === 0 ? (
-        <span className="text-xs font-medium text-slate-400">Thinking of follow-ups…</span>
+        <span className="text-xs font-medium text-slate-400">
+          Thinking of follow-ups…
+        </span>
       ) : (
         suggestions.map((suggestion) => (
           <button
@@ -338,7 +444,15 @@ function QuickReplies({ suggestions, loading, onPick }: { suggestions: string[];
   );
 }
 
-function Composer({ disabled, gathering, onSend }: { disabled: boolean; gathering: boolean; onSend: (text: string) => void }) {
+function Composer({
+  disabled,
+  gathering,
+  onSend,
+}: {
+  disabled: boolean;
+  gathering: boolean;
+  onSend: (text: string) => void;
+}) {
   const [value, setValue] = useState('');
 
   function submit() {
@@ -383,7 +497,15 @@ function Composer({ disabled, gathering, onSend }: { disabled: boolean; gatherin
   );
 }
 
-function RecentSummary({ items, gathering, connected }: { items: GatheredItems; gathering: boolean; connected: string[] }) {
+function RecentSummary({
+  items,
+  gathering,
+  connected,
+}: {
+  items: GatheredItems;
+  gathering: boolean;
+  connected: string[];
+}) {
   const [top, setTop] = useState<BriefingResult['top'] | null>(null);
   const [loading, setLoading] = useState(items.length > 0);
 
@@ -401,7 +523,9 @@ function RecentSummary({ items, gathering, connected }: { items: GatheredItems; 
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ items }),
         });
-        const data = (await response.json().catch(() => ({}))) as BriefingResult & { error?: string };
+        const data = (await response
+          .json()
+          .catch(() => ({}))) as BriefingResult & { error?: string };
         if (!cancelled && response.ok) setTop(data.top ?? null);
       } catch {
         /* ignore */
@@ -424,7 +548,10 @@ function RecentSummary({ items, gathering, connected }: { items: GatheredItems; 
       {connected.length === 0 ? (
         <p className="mt-3 text-sm text-slate-500">
           No apps connected yet.{' '}
-          <Link href="/integrations" className="font-semibold text-violet-600 underline underline-offset-2">
+          <Link
+            href="/integrations"
+            className="font-semibold text-violet-600 underline underline-offset-2"
+          >
             Connect an app
           </Link>{' '}
           so the assistant can use your data.
@@ -440,7 +567,10 @@ function RecentSummary({ items, gathering, connected }: { items: GatheredItems; 
           {top.highlights.length > 0 && (
             <ul className="mt-3 flex flex-wrap gap-2">
               {top.highlights.map((highlight, index) => (
-                <li key={index} className="inline-flex items-center gap-1.5 rounded-full bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600">
+                <li
+                  key={index}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600"
+                >
                   <span className="size-1.5 rounded-full bg-violet-500" />
                   {highlight}
                 </li>
@@ -449,7 +579,9 @@ function RecentSummary({ items, gathering, connected }: { items: GatheredItems; 
           )}
         </>
       ) : (
-        <p className="mt-3 text-sm text-slate-500">All clear — nothing pressing in your latest activity.</p>
+        <p className="mt-3 text-sm text-slate-500">
+          All clear — nothing pressing in your latest activity.
+        </p>
       )}
     </section>
   );

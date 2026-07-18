@@ -22,18 +22,35 @@ import {
   type BriefingResult,
   type CategoryKey,
 } from '@/lib/briefing-ai';
-import { computeCategoryCounts, gatherItems, type GatheredItems, writeSnapshot } from '@/lib/briefing-data';
+import {
+  computeCategoryCounts,
+  gatherItems,
+  type GatheredItems,
+  writeSnapshot,
+} from '@/lib/briefing-data';
 import { computeNextRun, type Frequency } from '@/lib/briefing-schedule';
 import { platformById, platformLogo, platformName } from '@/lib/integrations';
 import { insforge } from '@/lib/insforge';
 
-type StoredBriefing = { id: string; kind: string; title: string; created_at: string };
+type StoredBriefing = {
+  id: string;
+  kind: string;
+  title: string;
+  created_at: string;
+};
 
-const CATEGORY_META: Record<CategoryKey, { label: string; icon: LucideIcon; color: string }> = {
+const CATEGORY_META: Record<
+  CategoryKey,
+  { label: string; icon: LucideIcon; color: string }
+> = {
   email: { label: 'Email', icon: Mail, color: 'bg-violet-500' },
   messages: { label: 'Messages', icon: MessageCircle, color: 'bg-emerald-500' },
   mentions: { label: 'Mentions', icon: AtSign, color: 'bg-sky-500' },
-  tasks: { label: 'Tasks', icon: ListChecks, color: 'bg-amber-400 text-amber-950' },
+  tasks: {
+    label: 'Tasks',
+    icon: ListChecks,
+    color: 'bg-amber-400 text-amber-950',
+  },
   followups: { label: 'Follow-ups', icon: Clock, color: 'bg-rose-500' },
 };
 
@@ -63,7 +80,10 @@ export function BriefingPage() {
   const [connected, setConnected] = useState<string[]>([]);
   const [noConnections, setNoConnections] = useState(false);
   const [result, setResult] = useState<BriefingResult | null>(null);
-  const [instantCounts, setInstantCounts] = useState<Record<CategoryKey, number> | null>(null);
+  const [instantCounts, setInstantCounts] = useState<Record<
+    CategoryKey,
+    number
+  > | null>(null);
   const [items, setItems] = useState<GatheredItems>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -79,16 +99,27 @@ export function BriefingPage() {
 
     async function run() {
       const { data: authData } = await insforge.auth.getCurrentUser();
-      const user = authData.user as { id: string; email?: string | null; profile?: { name?: string | null } | null } | null;
+      const user = authData.user as {
+        id: string;
+        email?: string | null;
+        profile?: { name?: string | null } | null;
+      } | null;
       if (cancelled || !user) {
         if (!cancelled) setLoading(false);
         return;
       }
-      setName(user.profile?.name?.trim() || user.email?.split('@')[0] || 'there');
+      setName(
+        user.profile?.name?.trim() || user.email?.split('@')[0] || 'there'
+      );
       setUserId(user.id);
 
-      const { data: rows } = await insforge.database.from('user_integrations').select('platform, status').eq('user_id', user.id);
-      const connectedIds = (rows ?? []).filter((row) => row.status === 'connected').map((row) => String(row.platform));
+      const { data: rows } = await insforge.database
+        .from('user_integrations')
+        .select('platform, status')
+        .eq('user_id', user.id);
+      const connectedIds = (rows ?? [])
+        .filter((row) => row.status === 'connected')
+        .map((row) => String(row.platform));
       if (cancelled) return;
       setConnected(connectedIds);
 
@@ -141,7 +172,11 @@ export function BriefingPage() {
           .eq('user_id', uid)
           .order('created_at', { ascending: false });
         if (cancelled) return;
-        setPast(((data ?? []) as StoredBriefing[]).filter((row) => row.kind !== 'daily').slice(0, 8));
+        setPast(
+          ((data ?? []) as StoredBriefing[])
+            .filter((row) => row.kind !== 'daily')
+            .slice(0, 8)
+        );
       } catch {
         /* table missing */
       }
@@ -159,7 +194,8 @@ export function BriefingPage() {
   };
   const reload = () => setReloadKey((key) => key + 1);
 
-  const categoryFor = (key: CategoryKey) => result?.categories.find((category) => category.key === key);
+  const categoryFor = (key: CategoryKey) =>
+    result?.categories.find((category) => category.key === key);
 
   return (
     <div className="mx-auto max-w-7xl p-5 sm:p-8">
@@ -172,7 +208,8 @@ export function BriefingPage() {
             Your briefings{name ? `, ${name}` : ''}
           </h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-400">
-            A daily digest of what matters across your connected apps, plus the custom briefings you schedule.
+            A daily digest of what matters across your connected apps, plus the
+            custom briefings you schedule.
           </p>
         </div>
         <button
@@ -189,8 +226,18 @@ export function BriefingPage() {
         <EmptyState />
       ) : (
         <section className="mt-6 grid gap-4 lg:grid-cols-[1.5fr_1fr_1fr]">
-          <TodaysBriefingCard result={result} items={items} loading={loading} error={error} onRefresh={refresh} />
-          <CategoriesCard categoryFor={categoryFor} instantCounts={instantCounts} loading={loading} />
+          <TodaysBriefingCard
+            result={result}
+            items={items}
+            loading={loading}
+            error={error}
+            onRefresh={refresh}
+          />
+          <CategoriesCard
+            categoryFor={categoryFor}
+            instantCounts={instantCounts}
+            loading={loading}
+          />
           <ScheduledCard past={past} />
         </section>
       )}
@@ -210,15 +257,28 @@ export function BriefingPage() {
     </div>
   );
 
-  async function runDueSchedules(uid: string, gathered: GatheredItems): Promise<boolean> {
+  async function runDueSchedules(
+    uid: string,
+    gathered: GatheredItems
+  ): Promise<boolean> {
     try {
-      const { data } = await insforge.database.from('briefing_schedules').select('*').eq('user_id', uid);
+      const { data } = await insforge.database
+        .from('briefing_schedules')
+        .select('*')
+        .eq('user_id', uid);
       const now = Date.now();
-      const due = (data ?? []).filter((row) => row.enabled && new Date(String(row.next_run_at)).getTime() <= now);
+      const due = (data ?? []).filter(
+        (row) =>
+          row.enabled && new Date(String(row.next_run_at)).getTime() <= now
+      );
       if (due.length === 0) return false;
       for (const row of due) {
         const categories = parseJson<string[]>(row.categories, []);
-        const generated = await generateBriefing(gathered, String(row.description ?? ''), categories);
+        const generated = await generateBriefing(
+          gathered,
+          String(row.description ?? ''),
+          categories
+        );
         if ('error' in generated) continue;
         await insforge.database.from('briefings').insert([
           {
@@ -230,8 +290,14 @@ export function BriefingPage() {
             created_at: new Date().toISOString(),
           },
         ]);
-        const next = computeNextRun((row.frequency as Frequency) ?? 'daily', String(row.scheduled_time ?? '08:00'));
-        await insforge.database.from('briefing_schedules').update({ next_run_at: next.toISOString() }).eq('id', row.id);
+        const next = computeNextRun(
+          (row.frequency as Frequency) ?? 'daily',
+          String(row.scheduled_time ?? '08:00')
+        );
+        await insforge.database
+          .from('briefing_schedules')
+          .update({ next_run_at: next.toISOString() })
+          .eq('id', row.id);
       }
       return true;
     } catch {
@@ -240,15 +306,22 @@ export function BriefingPage() {
   }
 }
 
-async function generateBriefing(items: GatheredItems, goal?: string, categories?: string[]): Promise<BriefingResult | { error: string }> {
+async function generateBriefing(
+  items: GatheredItems,
+  goal?: string,
+  categories?: string[]
+): Promise<BriefingResult | { error: string }> {
   try {
     const response = await fetch('/api/briefing/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ items, goal, categories }),
     });
-    const data = (await response.json().catch(() => ({}))) as BriefingResult & { error?: string };
-    if (!response.ok) return { error: data.error ?? 'Could not generate the briefing.' };
+    const data = (await response.json().catch(() => ({}))) as BriefingResult & {
+      error?: string;
+    };
+    if (!response.ok)
+      return { error: data.error ?? 'Could not generate the briefing.' };
     return data;
   } catch {
     return { error: 'Network error while generating the briefing.' };
@@ -263,10 +336,15 @@ async function readTodayDaily(userId: string): Promise<BriefingResult | null> {
       .eq('user_id', userId)
       .eq('kind', 'daily')
       .order('created_at', { ascending: false });
-    const row = (data ?? [])[0] as { data?: unknown; created_at?: string } | undefined;
+    const row = (data ?? [])[0] as
+      { data?: unknown; created_at?: string } | undefined;
     if (!row?.created_at) return null;
-    if (new Date(row.created_at).toDateString() !== new Date().toDateString()) return null;
-    const parsed = parseJson<{ top?: BriefingResult['top']; categories?: BriefingResult['categories'] }>(row.data, {});
+    if (new Date(row.created_at).toDateString() !== new Date().toDateString())
+      return null;
+    const parsed = parseJson<{
+      top?: BriefingResult['top'];
+      categories?: BriefingResult['categories'];
+    }>(row.data, {});
     if (!parsed.top) return null;
     return { top: parsed.top, categories: parsed.categories ?? [] };
   } catch {
@@ -274,7 +352,11 @@ async function readTodayDaily(userId: string): Promise<BriefingResult | null> {
   }
 }
 
-async function persistDaily(userId: string, result: BriefingResult, items: GatheredItems) {
+async function persistDaily(
+  userId: string,
+  result: BriefingResult,
+  items: GatheredItems
+) {
   const record = {
     kind: 'daily',
     title: result.top.title,
@@ -288,19 +370,44 @@ async function persistDaily(userId: string, result: BriefingResult, items: Gathe
       .eq('user_id', userId)
       .eq('kind', 'daily')
       .order('created_at', { ascending: false });
-    const latest = (data ?? [])[0] as { id: string; created_at: string } | undefined;
-    if (latest && new Date(latest.created_at).toDateString() === new Date().toDateString()) {
-      await insforge.database.from('briefings').update(record).eq('id', latest.id);
+    const latest = (data ?? [])[0] as
+      { id: string; created_at: string } | undefined;
+    if (
+      latest &&
+      new Date(latest.created_at).toDateString() === new Date().toDateString()
+    ) {
+      await insforge.database
+        .from('briefings')
+        .update(record)
+        .eq('id', latest.id);
     } else {
-      await insforge.database.from('briefings').insert([{ user_id: userId, ...record }]);
+      await insforge.database
+        .from('briefings')
+        .insert([{ user_id: userId, ...record }]);
     }
   } catch {
     /* table missing */
   }
 }
 
-function TodaysBriefingCard({ result, items, loading, error, onRefresh }: { result: BriefingResult | null; items: GatheredItems; loading: boolean; error: string | null; onRefresh: () => void }) {
-  const listing = items.flatMap((item) => item.messages.map((message) => ({ platform: item.platform, message }))).slice(0, 6);
+function TodaysBriefingCard({
+  result,
+  items,
+  loading,
+  error,
+  onRefresh,
+}: {
+  result: BriefingResult | null;
+  items: GatheredItems;
+  loading: boolean;
+  error: string | null;
+  onRefresh: () => void;
+}) {
+  const listing = items
+    .flatMap((item) =>
+      item.messages.map((message) => ({ platform: item.platform, message }))
+    )
+    .slice(0, 6);
 
   return (
     <section className="dashboard-card rounded-3xl border border-slate-200 bg-white p-6">
@@ -310,8 +417,12 @@ function TodaysBriefingCard({ result, items, loading, error, onRefresh }: { resu
             <Sparkles size={22} aria-hidden="true" />
           </span>
           <div>
-            <p className="text-xs font-semibold tracking-wider text-violet-600">TODAY&apos;S BRIEFING</p>
-            <h3 className="text-lg font-bold tracking-tight">{result?.top.title ?? (loading ? 'Generating…' : 'Your briefing')}</h3>
+            <p className="text-xs font-semibold tracking-wider text-violet-600">
+              TODAY&apos;S BRIEFING
+            </p>
+            <h3 className="text-lg font-bold tracking-tight">
+              {result?.top.title ?? (loading ? 'Generating…' : 'Your briefing')}
+            </h3>
           </div>
         </div>
         <button
@@ -321,7 +432,11 @@ function TodaysBriefingCard({ result, items, loading, error, onRefresh }: { resu
           aria-label="Regenerate briefing"
           className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} aria-hidden="true" />
+          <RefreshCw
+            size={16}
+            className={loading ? 'animate-spin' : ''}
+            aria-hidden="true"
+          />
           <span className="hidden sm:inline">Refresh</span>
         </button>
       </div>
@@ -329,41 +444,75 @@ function TodaysBriefingCard({ result, items, loading, error, onRefresh }: { resu
       {error ? (
         <div className="mt-4 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">
           {error}{' '}
-          <Link href="/integrations" className="font-semibold underline underline-offset-2">
+          <Link
+            href="/integrations"
+            className="font-semibold underline underline-offset-2"
+          >
             Manage integrations
           </Link>
         </div>
       ) : (
         <>
           {(result?.top.summary || loading) && (
-            <p className="mt-4 text-sm leading-6 text-slate-600">{result?.top.summary ?? 'Scanning your connected apps…'}</p>
+            <p className="mt-4 text-sm leading-6 text-slate-600">
+              {result?.top.summary ?? 'Scanning your connected apps…'}
+            </p>
           )}
 
           <ul className="mt-4 divide-y divide-slate-100">
             {loading && listing.length === 0 ? (
-              [0, 1, 2].map((row) => <li key={row} className="h-12 animate-pulse rounded-xl bg-slate-100" />)
+              [0, 1, 2].map((row) => (
+                <li
+                  key={row}
+                  className="h-12 animate-pulse rounded-xl bg-slate-100"
+                />
+              ))
             ) : listing.length === 0 ? (
-              <li className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-500">No items to brief right now.</li>
+              <li className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-500">
+                No items to brief right now.
+              </li>
             ) : (
               listing.map((entry, index) => (
-                <li key={index} className="flex items-start gap-3 py-3 first:pt-0">
-                  <span className={`grid size-9 shrink-0 place-items-center overflow-hidden rounded-xl ${platformById[entry.platform]?.tileClass ?? 'bg-slate-100'}`}>
-                    <Image src={platformLogo(entry.platform)} alt="" width={20} height={20} className="size-5 object-contain" />
+                <li
+                  key={index}
+                  className="flex items-start gap-3 py-3 first:pt-0"
+                >
+                  <span
+                    className={`grid size-9 shrink-0 place-items-center overflow-hidden rounded-xl ${platformById[entry.platform]?.tileClass ?? 'bg-slate-100'}`}
+                  >
+                    <Image
+                      src={platformLogo(entry.platform)}
+                      alt=""
+                      width={20}
+                      height={20}
+                      className="size-5 object-contain"
+                    />
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="truncate text-sm font-bold text-slate-950">{entry.message.sender}</p>
-                      <span className="shrink-0 text-xs text-slate-400">{entry.message.time}</span>
+                      <p className="truncate text-sm font-bold text-slate-950">
+                        {entry.message.sender}
+                      </p>
+                      <span className="shrink-0 text-xs text-slate-400">
+                        {entry.message.time}
+                      </span>
                     </div>
-                    <p className="truncate text-sm text-slate-600">{entry.message.subject}</p>
-                    <p className="mt-0.5 text-xs font-medium text-slate-400">{platformName(entry.platform)}</p>
+                    <p className="truncate text-sm text-slate-600">
+                      {entry.message.subject}
+                    </p>
+                    <p className="mt-0.5 text-xs font-medium text-slate-400">
+                      {platformName(entry.platform)}
+                    </p>
                   </div>
                 </li>
               ))
             )}
           </ul>
 
-          <Link href="/briefing/today" className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-violet-600 hover:text-violet-500">
+          <Link
+            href="/briefing/today"
+            className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-violet-600 hover:text-violet-500"
+          >
             Open full briefing
             <ArrowUpRight size={15} aria-hidden="true" />
           </Link>
@@ -373,34 +522,57 @@ function TodaysBriefingCard({ result, items, loading, error, onRefresh }: { resu
   );
 }
 
-function CategoriesCard({ categoryFor, instantCounts, loading }: { categoryFor: (key: CategoryKey) => BriefingResult['categories'][number] | undefined; instantCounts: Record<CategoryKey, number> | null; loading: boolean }) {
+function CategoriesCard({
+  categoryFor,
+  instantCounts,
+  loading,
+}: {
+  categoryFor: (
+    key: CategoryKey
+  ) => BriefingResult['categories'][number] | undefined;
+  instantCounts: Record<CategoryKey, number> | null;
+  loading: boolean;
+}) {
   return (
     <section className="dashboard-card rounded-3xl border border-slate-200 bg-white p-6">
       <h3 className="text-lg font-bold tracking-tight">Categories</h3>
-      <p className="text-sm text-slate-500">Grouped across your connected apps.</p>
+      <p className="text-sm text-slate-500">
+        Grouped across your connected apps.
+      </p>
       <div className="mt-4 grid gap-2.5">
         {CATEGORY_KEYS.map((key) => {
           const meta = CATEGORY_META[key];
           const category = categoryFor(key);
           const count = category?.count ?? instantCounts?.[key] ?? 0;
-          const summary = category?.summary ?? (loading ? 'Scanning…' : 'Nothing new here.');
+          const summary =
+            category?.summary ?? (loading ? 'Scanning…' : 'Nothing new here.');
           return (
             <Link
               key={key}
               href={`/briefing/today?category=${key}`}
               className="group flex items-center gap-3 rounded-2xl border border-slate-200 p-3 transition hover:border-violet-300 hover:bg-slate-50"
             >
-              <span className={`grid size-10 shrink-0 place-items-center rounded-xl text-white ${meta.color}`}>
+              <span
+                className={`grid size-10 shrink-0 place-items-center rounded-xl text-white ${meta.color}`}
+              >
                 <meta.icon size={20} aria-hidden="true" />
               </span>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-sm font-bold text-slate-950">{meta.label}</p>
-                  <span className="text-lg font-bold tracking-tight">{count}</span>
+                  <p className="text-sm font-bold text-slate-950">
+                    {meta.label}
+                  </p>
+                  <span className="text-lg font-bold tracking-tight">
+                    {count}
+                  </span>
                 </div>
                 <p className="truncate text-xs text-slate-500">{summary}</p>
               </div>
-              <ArrowUpRight size={15} className="shrink-0 text-slate-400 transition group-hover:translate-x-0.5" aria-hidden="true" />
+              <ArrowUpRight
+                size={15}
+                className="shrink-0 text-slate-400 transition group-hover:translate-x-0.5"
+                aria-hidden="true"
+              />
             </Link>
           );
         })}
@@ -413,24 +585,41 @@ function ScheduledCard({ past }: { past: StoredBriefing[] }) {
   return (
     <section className="dashboard-card rounded-3xl border border-slate-200 bg-white p-6">
       <h3 className="text-lg font-bold tracking-tight">Scheduled briefings</h3>
-      <p className="text-sm text-slate-500">Generated from your saved schedules.</p>
+      <p className="text-sm text-slate-500">
+        Generated from your saved schedules.
+      </p>
       <ul className="mt-4 space-y-2.5">
         {past.length === 0 ? (
-          <li className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-500">No scheduled briefings yet. Create one to receive them automatically.</li>
+          <li className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-500">
+            No scheduled briefings yet. Create one to receive them
+            automatically.
+          </li>
         ) : (
           past.map((row) => (
             <li key={row.id}>
-              <Link href={`/briefing/${row.id}`} className="flex items-center gap-3 rounded-2xl border border-slate-200 p-3.5 transition hover:bg-slate-50">
+              <Link
+                href={`/briefing/${row.id}`}
+                className="flex items-center gap-3 rounded-2xl border border-slate-200 p-3.5 transition hover:bg-slate-50"
+              >
                 <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-amber-100 text-amber-700">
                   <Sparkles size={18} aria-hidden="true" />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-bold text-slate-950">{row.title || 'Briefing'}</p>
+                  <p className="truncate text-sm font-bold text-slate-950">
+                    {row.title || 'Briefing'}
+                  </p>
                   <p className="text-xs text-slate-400">
-                    <span className="font-semibold uppercase text-slate-500">{row.kind}</span> · {relativeTime(row.created_at)}
+                    <span className="font-semibold uppercase text-slate-500">
+                      {row.kind}
+                    </span>{' '}
+                    · {relativeTime(row.created_at)}
                   </p>
                 </div>
-                <ArrowUpRight size={16} className="shrink-0 text-slate-400" aria-hidden="true" />
+                <ArrowUpRight
+                  size={16}
+                  className="shrink-0 text-slate-400"
+                  aria-hidden="true"
+                />
               </Link>
             </li>
           ))
@@ -446,9 +635,17 @@ function EmptyState() {
       <span className="grid size-14 place-items-center rounded-2xl bg-violet-500 text-white">
         <Plug size={28} aria-hidden="true" />
       </span>
-      <h3 className="mt-5 text-xl font-bold tracking-tight">Connect an app to get briefings</h3>
-      <p className="mt-2 max-w-md text-sm leading-6 text-slate-500">Link Gmail and your other tools so OmniMind can gather today&apos;s activity and brief you on what matters.</p>
-      <Link href="/integrations" className="mt-6 inline-flex items-center gap-2 rounded-xl bg-violet-500 px-5 py-3 text-sm font-bold text-white transition hover:bg-violet-400 active:translate-y-px">
+      <h3 className="mt-5 text-xl font-bold tracking-tight">
+        Connect an app to get briefings
+      </h3>
+      <p className="mt-2 max-w-md text-sm leading-6 text-slate-500">
+        Link Gmail and your other tools so OmniMind can gather today&apos;s
+        activity and brief you on what matters.
+      </p>
+      <Link
+        href="/integrations"
+        className="mt-6 inline-flex items-center gap-2 rounded-xl bg-violet-500 px-5 py-3 text-sm font-bold text-white transition hover:bg-violet-400 active:translate-y-px"
+      >
         Go to Integrations
         <ArrowUpRight size={17} aria-hidden="true" />
       </Link>
